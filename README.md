@@ -1,7 +1,7 @@
 
 # ANSURR | Accuracy of NMR Structures Using RCI and Rigidity
 
-ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as will be described in our paper (to be submitted soon). This repository contains the code required to install and run ANSURR on a Linux machine (and hopefully Mac soon). 
+ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as will be described in our paper (to be submitted soon). This repository contains the code required to install and run ANSURR on a Linux (and possibly Mac) machine. 
 
 ## Installation
 
