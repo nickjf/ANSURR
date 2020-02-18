@@ -1,0 +1,267 @@
+#!/bin/bash
+python_version=python
+ANSURR_DIR=$(pwd)
+
+########## PROGRAMS ##########
+split_shifts=$ANSURR_DIR/progs/split_shifts.py
+PANAV=$ANSURR_DIR/progs/PANAV.jar
+RCI=$ANSURR_DIR/progs/RCI.py
+extract_NMR=$ANSURR_DIR/progs/extract_NMR.py
+DSSP=$ANSURR_DIR/progs/dssp-2.0.4-linux-i386
+FIRST=$ANSURR_DIR/progs/calc_rigidity
+rigid_decomp=$ANSURR_DIR/progs/rigid_decomp.py
+compare=$ANSURR_DIR/progs/compare.py
+plot2D=$ANSURR_DIR/progs/plot2D.py
+
+########## ARGS ##########
+run_PANAV=0
+while getopts ":p:s:hr" opt; do
+  case $opt in
+	h) echo "Usage:"
+	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
+	   echo "Options:"
+	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
+	   exit 1;;
+    p) structure=$(echo $OPTARG | cut -d'.' -f1)
+	   if [ "$OPTARG" != $structure.pdb ]; then
+			echo "structure file:" $OPTARG", renamed to $structure.pdb" | tee -a $log
+			cp $OPTARG $structure.pdb
+	   else 
+			echo "structure file:" $OPTARG | tee -a $log
+	   fi;;
+    s) shifts=$(echo $OPTARG | cut -d'.' -f1)
+	   if [ "$OPTARG" != $shifts.str ]; then
+			echo "shifts file:" $OPTARG", renamed to $shifts.str" | tee -a $log
+			cp $OPTARG $shifts.str
+	   else 
+			echo "shifts file:" $OPTARG | tee -a $log
+	   fi;;
+	r)  run_PANAV=1;;
+    \?) echo "Invalid option: -$OPTARG" >&2
+        exit 1;;
+    :)  echo "Option -$OPTARG requires an argument." >&2
+        exit 1;;
+  esac
+done
+
+# pdb and shift file are required
+if [ "x" == "x$structure" ]; then
+ 	echo "-p [pdb file] is required" | tee -a $log
+	if [ "x" == "x$shifts" ]; then
+  		echo "-s [shifts file] is required" | tee -a $log
+  		exit 1
+	fi
+  exit 1
+fi
+if [ "x" == "x$shifts" ]; then
+  echo "-s [shifts file] is required" | tee -a $log
+  exit 1
+fi
+
+########## LOG FILE ##########
+# log file
+log=ANSURR.log
+DATE=`date '+%Y-%m-%d %H:%M:%S'`
+echo $'\n------------------------ '$DATE' running ANSURR -------------------------' | tee -a $log
+
+########## OUTPUT FOLDER ##########
+rm -rf $structure'_'$shifts
+mkdir -p $structure'_'$shifts
+cp $structure.pdb $structure'_'$shifts
+cp $shifts.str $structure'_'$shifts
+cd $structure'_'$shifts
+log=../$log
+echo "all output will be saved to "$structure'_'$shifts$'\n' | tee -a $log
+
+########## SPLIT SHIFTS ###########
+
+entities=$(grep "_Entity.ID" $shifts.str | wc -l)
+if (( $entities > 1 )); then
+	echo "$entities entities found in shifts file"
+	$python_version $split_shifts $shifts.str
+	rm $shifts.str
+fi
+
+########## PANAV ##########
+if [ $run_PANAV == 1 ]; then
+	# check PANAV exists
+	if [ -f "$PANAV" ]; then
+		echo -n "re-referencing chemical shifts using PANAV" | tee -a $log
+		run_PANAV=1
+	else 
+		echo " ERROR" | tee -a $log
+		echo " -> could not find $PANAV, will proceed without re-referencing chemical shifts" | tee -a $log
+		run_PANAV=0
+	fi
+else
+	echo "will not re-reference chemical shifts" | tee -a $log
+fi
+
+# run PANAV
+if [ -z $(command -v java) ]; then
+	echo " ERROR" | tee -a $log
+	echo " -> Java is not installed, so cannot run PANAV, will proceed without re-referencing chemical shifts" | tee -a $log
+	run_PANAV=0
+else
+	if [ $run_PANAV == 1 ]; then
+		rm -rf PANAV_temp 
+		mkdir -p PANAV_temp
+		cp  $shifts*.str PANAV_temp
+		java -jar $PANAV PANAV_temp >/dev/null
+		# check PANAV success
+		if (( $(ls -l PANAV_temp/*_calibrated | wc -l) > 0 )); then 
+			for s in PANAV_temp/*_calibrated; do
+				mv $s $(basename $s | cut -d'.' -f1)'.panav'
+			done
+			rm -rf PANAV_temp 
+			mkdir -p other_output/PANAV
+			mv $shifts*'.panav' other_output/PANAV
+			echo " DONE" | tee -a $log
+			echo " -> re-referenced shifts saved to $structure"_"$shifts/other_output/PANAV" | tee -a $log
+		else
+			echo " ERROR" | tee -a $log
+			echo " -> PANAV did not run succesfully, will proceed without re-referencing chemical shifts" | tee -a $log
+			run_PANAV=0
+			rm -rf PANAV_temp
+		fi
+	fi
+fi
+
+########## RCI ##########
+# run RCI
+if [ -f "$RCI" ]; then
+	echo -n "calculating RCI" | tee -a $log
+	if [ $run_PANAV == 1 ]; then
+		for s in other_output/PANAV/$shifts*'.panav'; do
+			$python_version $RCI $s 2>/dev/null
+		done
+	else
+		$python_version $RCI $shifts.str 2>/dev/null
+	fi
+else 
+    echo " ERROR" | tee -a $log
+    echo " -> could not find $RCI, exiting" | tee -a $log
+	exit 1
+fi
+
+# check RCI success
+if (( $(ls -l $shifts*'.rci' | wc -l) > 0 )); then 
+	echo " DONE" | tee -a $log
+	echo " -> output saved to $structure"_"$shifts/other_output/RCI" | tee -a $log
+	mkdir -p other_output/RCI
+	mv $shifts*'.rci' other_output/RCI
+else
+	echo " ERROR" | tee -a $log
+	echo " -> RCI did not run successfully, exiting" | tee -a $log
+	exit 1
+fi
+
+########## EXTRACT MODELS ##########
+# extract models from pdb
+if [ -f "$extract_NMR" ]; then
+	echo -n "extracting models from $structure.pdb" | tee -a $log
+	$python_version $extract_NMR $structure.pdb
+else 
+    echo " ERROR" | tee -a $log
+    echo " -> could not find $extract_NMR, exiting" | tee -a $log
+	exit 1
+fi
+
+#check extract success
+count=$(ls -l $structure*'_'*.pdb 2>/dev/null | wc -l)
+if [ $count -gt 0 ]; then
+	mkdir -p other_output/extracted_pdbs
+	mv $structure*'_'*.pdb other_output/extracted_pdbs
+	count=$(ls -l other_output/extracted_pdbs/* | wc -l)
+	echo " DONE" | tee -a $log
+	echo " -> extracted $count model(s) saved to $structure"_"$shifts/other_output/extracted_pdbs" | tee -a $log
+else
+	echo " ERROR" | tee -a $log
+	echo " -> failed to extract any models, exiting" | tee -a $log
+	exit 1
+fi
+
+########## CALC SECONDARY STRUCTURE ##########
+# extract models from pdb
+if [ -f "$DSSP" ]; then
+	echo -n "predicting secondary structure for each model using DSSP" | tee -a $log
+	mkdir -p other_output/DSSP
+	for pdb in other_output/extracted_pdbs/$structure*.pdb; do
+		pdb_num=$(basename $pdb | cut -d'.' -f1)
+		$DSSP -i $pdb -o $pdb_num.temp.dssp
+		sed -n -e '/#/,$p' $pdb_num.temp.dssp | tail -n +2 | cut -c6-11,13-17 | sed -e 's/^[[:space:]]*//' | tr -s ' ' > $pdb_num.dssp
+		mv $pdb_num.dssp other_output/DSSP
+		rm $pdb_num.temp.dssp
+	done
+else 
+    echo " ERROR" | tee -a $log
+    echo " -> could not find $DSSP, will continue without predicting secondary structure" | tee -a $log
+fi
+
+#check calc secondary structure success
+count=$(ls -l other_output/DSSP/* | wc -l)
+if [ $count -gt 0 ]; then
+	echo " DONE"  | tee -a $log
+	echo " -> predicted secondary structure for $count model(s) saved to $structure"_"$shifts/other_output/DSSP"  | tee -a $log
+else
+	echo " ERROR"  | tee -a $log
+	echo " -> DSSP didn't predict secondary structure for any models"  | tee -a $log
+fi
+
+########## FIRST ##########
+if [ -f "$FIRST" ]; then
+	echo "running FIRST for each model, output will be saved to $structure"_"$shifts/other_output/FIRST" | tee -a $log
+	for pdb in other_output/extracted_pdbs/$structure*.pdb; do 
+		pdb_num=$(basename $pdb | cut -d'.' -f1)
+		echo -n " -> $pdb_num" | tee -a $log
+		{ LIBC_FATAL_STDERR_=1 $FIRST $pdb $ANSURR_DIR > $pdb_num'_FIRST.log' 2>/dev/null; } &>/dev/null
+		if grep -q "Calculating rigidity" $pdb_num'_FIRST.log'; then
+			echo " DONE" | tee -a $log
+			$python_version $rigid_decomp $pdb other_output/extracted_pdbs/decomp_list
+			mkdir -p other_output/FIRST/$pdb_num
+			mv $pdb_num'.decomp' other_output/FIRST/$pdb_num
+			rm -f $pdb_num'_FIRST.log'
+			rm -f other_output/extracted_pdbs/decomp_list
+			rm -f tmp.ps
+		else
+			echo " ERROR FIRST did not run succesfully" | tee -a $log
+			rm -f other_output/extracted_pdbs/decomp_list
+			rm -f $pdb_num'_FIRST.log'
+			rm -f tmp.ps
+		fi
+	done
+else
+	echo " ERROR" | tee -a $log
+	echo " -> could not find $FIRST, exiting" | tee -a $log
+	exit 1
+fi
+
+########## COMPARE RCI FIRST ##########
+echo "calculating validation scores" | tee -a $log
+mkdir ANSURR_output
+DATE=`date '+%Y-%m-%d %H:%M:%S'`
+echo $'\n-------------------- '$DATE' ---------------------' > scores.out
+for pdb in other_output/FIRST/$structure*/$structure*.decomp; do
+	pdb_num=$(basename $pdb | cut -d'.' -f1)
+	for s in other_output/RCI/$shifts*.rci; do 
+		$python_version $compare $pdb $s other_output/DSSP/$pdb_num.dssp $ANSURR_DIR
+	done
+done
+# check compare success
+count=$(ls -l $structure*'_'*$shifts*'.out' 2>/dev/null | wc -l)
+if [ $count -ne 0 ]; then
+	$python_version $plot2D scores.out
+	mkdir -p ANSURR_output/figs
+	mkdir -p ANSURR_output/out
+	mv scores.out ANSURR_output/
+	mv $structure*'_'*'_'*$shifts*'.png' ANSURR_output/figs
+	mv $structure*'_'*$shifts*'.out' ANSURR_output/out
+	mv $structure*'_'*$shifts*'.png' ANSURR_output
+	echo " -> DONE output saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
+else
+	echo ' -> ERROR failed to calculate validation scores' | tee -a $log
+fi
+
+cd ../
+
+

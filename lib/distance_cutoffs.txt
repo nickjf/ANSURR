@@ -1,0 +1,52 @@
+C C   1.75  1.40  1.25
+C CL  1.563
+C H   1.18
+C MG  0.00
+C N   1.58
+C O   1.60
+C P   1.99
+C S   2.05
+C ZN  0.00 
+CAO   2.70
+CAN   2.45
+CAS   2.60
+CUN   2.20
+CUO   2.20
+CUS   2.20
+FEH   1.00
+FEN   2.40
+FEO   2.40
+FES   2.40
+GEGE  2.95
+GESE  2.95
+H H   0.78
+H MG  0.00
+H N   1.08
+H O   1.05
+H P   1.50
+H S   1.38
+H ZN  0.00
+K O   3.10
+MGMG  3.782
+MGN   2.50
+MGO   2.50
+MGS   2.50
+MNN   2.50
+MNO   2.50
+MNS   2.50
+N N   1.46
+N O   1.50
+N P   1.75
+N S   1.73
+N ZN  2.50
+NAF   1.830 
+NAO   2.70
+O O   1.55
+O P   1.80
+O S   1.60
+O ZN  2.50
+P P   2.30
+P S   2.10
+S S   2.10
+S ZN  2.50
+SESE  2.95
