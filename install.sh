@@ -4,7 +4,7 @@
 uname_out="$(uname -s)"
 case $uname_out in
 	Linux*)	machine=Linux;;
-	Darwn*)	machine=Mac;;
+	Darwin*)	machine=Mac;;
 	*)		machine=$uname_out;echo "unknown machine type: $uname_out, this installer probably won't work...";
 esac
 
