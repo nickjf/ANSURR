@@ -60,7 +60,7 @@ if [ ! -z "$missing_modules" ]; then
 	    read -p " -> would you like to try this now? (y/n) " yn
 	    case $yn in
 		[Yy]* ) if [ -z $(command -v pip) ]; then
-				echo "ERROR pip doesn't seem to be installed, install$missing_modules and re-run install.sh"
+				echo "ERROR pip doesn't seem to be installed, install$missing_modules and re-run install.sh"; exit 1
 			else
 				if [ $local_install == "1" ]; then
 					$python_version -m pip install$missing_modules --user
