@@ -109,7 +109,7 @@ def align(RCI,FIRST):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_N < cut_off * len(FIRST['resi']):
-            print('\n ->  ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%',end='')
+            print('\n ->  ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%')
             quit()
     else:
         if len(RCI['resi']) <= len(FIRST['resi']):
@@ -125,7 +125,7 @@ def align(RCI,FIRST):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_C < cut_off * len(FIRST['resi']):
-            print('\n ->  ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%',end='')
+            print('\n ->  ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%')
             quit()
     RCI['resi'] = FIRST['resi']
     return RCI, FIRST

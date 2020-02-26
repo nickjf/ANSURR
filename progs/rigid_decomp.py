@@ -39,7 +39,7 @@ for line in decomp:
         all_data.append(data)
         cluster_count = Counter(data)
         for c in cluster_count:
-            if int(cluster_count[c]) >= 30:
+            if int(cluster_count[c]) >= 15:
                 rc.append(c)
         rigid_clusters.append(rc)
         data = []
