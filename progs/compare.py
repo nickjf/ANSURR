@@ -314,7 +314,7 @@ spearman_noRC = percentileofscore(corr_benchmark,spearmanr(RCI_noRC,FIRST_noRC)[
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
 if av_perc_shifts < 75:
-    print('\n -> WARNING chemical shift completeness for ' + PDB_ID + ' (' + str(av_perc_shifts) +'%)' +' is below recommended cut-off of 75% and therefore RCI prediction may be unreliable', end='')
+    print('\n -> WARNING chemical shift completeness for ' + PDB_ID + '/' + SHIFT_ID + ' (' + str(av_perc_shifts) +'%)' +' is below recommended cut-off of 75%, RCI values may be unreliable', end='')
 
 # write output file
 RCI_FIRST_out = open(PDB_ID+'_'+SHIFT_ID+'.out','w')

@@ -262,7 +262,7 @@ if [ $count -ne 0 ]; then
 	mv $structure*'_'*'_'*$shifts*'.png' ANSURR_output/figs
 	mv $structure*'_'*$shifts*'.out' ANSURR_output/out
 	mv $structure*'_'*$shifts*'.png' ANSURR_output
-	echo $'\n'"-> DONE output saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
+	echo $'\n'" -> DONE output saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
 else
 	echo $'\n -> ERROR failed to calculate validation scores' | tee -a $log
 fi
