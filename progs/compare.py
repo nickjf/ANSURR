@@ -109,7 +109,7 @@ def align(RCI,FIRST):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_N < cut_off * len(FIRST['resi']):
-            print('\n ->  ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%')
+            print('\n -> ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%',end='')
             quit()
     else:
         if len(RCI['resi']) <= len(FIRST['resi']):
@@ -125,7 +125,7 @@ def align(RCI,FIRST):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_C < cut_off * len(FIRST['resi']):
-            print('\n ->  ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%')
+            print('\n -> ERROR sequence identity between residues in shifts file '+SHIFT_ID+' and pdb file '+PDB_ID+' is '+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%',end='')
             quit()
     RCI['resi'] = FIRST['resi']
     return RCI, FIRST
@@ -314,7 +314,7 @@ spearman_noRC = percentileofscore(corr_benchmark,spearmanr(RCI_noRC,FIRST_noRC)[
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
 if av_perc_shifts < 75:
-    print(' -> WARNING chemical shift completeness for ' + PDB_ID + ' (' + str(av_perc_shifts) +'%)' +' is below recommended cut-off of 75% and therefore RCI prediction may be unreliable')
+    print('\n -> WARNING chemical shift completeness for ' + PDB_ID + ' (' + str(av_perc_shifts) +'%)' +' is below recommended cut-off of 75% and therefore RCI prediction may be unreliable', end='')
 
 # write output file
 RCI_FIRST_out = open(PDB_ID+'_'+SHIFT_ID+'.out','w')

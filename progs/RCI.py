@@ -110,9 +110,8 @@ def extract_shifts_nmrstar3(file_in):
             break
         elif line != '\n':
             line = line.split()
-            Entity_ID = int(line[5])
-            if Entity_ID  == 1:
-                resn = line[1]
+            resn = line[1]
+            if resn in amino_acids.values():
                 resi = int(line[2])
                 seq[resi] = resn
                 
@@ -129,29 +128,28 @@ def extract_shifts_nmrstar3(file_in):
             break
         elif line != '\n':
             line = line.split()
-            Entity_assembly_ID = int(line[2])
-            Entity_ID = int(line[3])
             atom_type = line[7] 
-            if atom_type in atoms and Entity_assembly_ID == 1 and Entity_ID == 1:
+            if atom_type in atoms:
                 resi = int(line[4])
                 resn = line[6]
                 shift = float(line[10])
-                for s in seq:
-                    if s == resi:
-                        break
-                    if s not in [r.i for r in res._registry]:
-                        r = res(s,seq[s])
-                        append_secshift(r,'C',0)
-                        append_secshift(r,'CA',0)
-                        append_secshift(r,'CB',0)
-                        append_secshift(r,'N',0)
-                        append_secshift(r,'H',0)
-                        append_secshift(r,'HA',0)
-                        r.assumed_RC = 1
-                if resi not in resis:
-                    r = res(resi,resn)
-                append_shift(r,atom_type,shift)
-                resis.append(resi)
+                if resn in amino_acids.values():
+                    for s in seq:
+                        if s == resi:
+                            break
+                        if s not in [r.i for r in res._registry]:
+                            r = res(s,seq[s])
+                            append_secshift(r,'C',0)
+                            append_secshift(r,'CA',0)
+                            append_secshift(r,'CB',0)
+                            append_secshift(r,'N',0)
+                            append_secshift(r,'H',0)
+                            append_secshift(r,'HA',0)
+                            r.assumed_RC = 1
+                    if resi not in resis:
+                        r = res(resi,resn)
+                    append_shift(r,atom_type,shift)
+                    resis.append(resi)
     for r in res._registry:
         if r.name == 'GLY':
             average_gly(r)

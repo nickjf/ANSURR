@@ -242,14 +242,14 @@ else
 fi
 
 ########## COMPARE RCI FIRST ##########
-echo "calculating validation scores" | tee -a $log
+echo -n "calculating validation scores" | tee -a $log
 mkdir ANSURR_output
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 echo $'\n-------------------- '$DATE' ---------------------' > scores.out
 for pdb in other_output/FIRST/$structure*/$structure*.decomp; do
 	pdb_num=$(basename $pdb | cut -d'.' -f1)
 	for s in other_output/RCI/$shifts*.rci; do 
-		$python_version $compare $pdb $s other_output/DSSP/$pdb_num.dssp $ANSURR_DIR
+		$python_version $compare $pdb $s other_output/DSSP/$pdb_num.dssp $ANSURR_DIR | tee -a $log
 	done
 done
 # check compare success
@@ -262,9 +262,9 @@ if [ $count -ne 0 ]; then
 	mv $structure*'_'*'_'*$shifts*'.png' ANSURR_output/figs
 	mv $structure*'_'*$shifts*'.out' ANSURR_output/out
 	mv $structure*'_'*$shifts*'.png' ANSURR_output
-	echo " -> DONE output saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
+	echo $'\n'"-> DONE output saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
 else
-	echo ' -> ERROR failed to calculate validation scores' | tee -a $log
+	echo $'\n -> ERROR failed to calculate validation scores' | tee -a $log
 fi
 
 cd ../
