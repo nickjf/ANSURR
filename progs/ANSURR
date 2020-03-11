@@ -6,7 +6,7 @@ ANSURR_DIR=$(pwd)
 split_shifts=$ANSURR_DIR/progs/split_shifts.py
 PANAV=$ANSURR_DIR/progs/PANAV.jar
 RCI=$ANSURR_DIR/progs/RCI.py
-extract_NMR=$ANSURR_DIR/progs/extract_NMR.py
+extract=$ANSURR_DIR/progs/extract.py
 DSSP=$ANSURR_DIR/progs/dssp-2.0.4-linux-i386
 FIRST=$ANSURR_DIR/progs/calc_rigidity
 rigid_decomp=$ANSURR_DIR/progs/rigid_decomp.py
@@ -15,11 +15,14 @@ plot2D=$ANSURR_DIR/progs/plot2D.py
 
 ########## ARGS ##########
 run_PANAV=0
-while getopts ":p:s:hr" opt; do
+allow_ligands=0
+while getopts ":p:s:hlr" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
+	   #echo " -h | add hydrogens to structure using REDUCE before running ANSURR"
+	   echo " -l | include ligands when computing rigidity"
 	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
 	   exit 1;;
     p) structure=$(echo $OPTARG | cut -d'.' -f1)
@@ -37,6 +40,7 @@ while getopts ":p:s:hr" opt; do
 			echo "shifts file:" $OPTARG | tee -a $log
 	   fi;;
 	r)  run_PANAV=1;;
+	l)  allow_ligands=1;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
     :)  echo "Option -$OPTARG requires an argument." >&2
@@ -98,16 +102,17 @@ else
 fi
 
 # run PANAV
-if [ -z $(command -v java) ]; then
-	echo " ERROR" | tee -a $log
-	echo " -> Java is not installed, so cannot run PANAV, will proceed without re-referencing chemical shifts" | tee -a $log
-	run_PANAV=0
-else
-	if [ $run_PANAV == 1 ]; then
+if [ $run_PANAV == 1 ]; then
+	if [ -z $(command -v java) ]; then	
+		echo " ERROR" | tee -a $log
+		echo " -> Java is not installed, so cannot run PANAV, will proceed without re-referencing chemical shifts" | tee -a $log
+		run_PANAV=0
+	else
 		rm -rf PANAV_temp 
 		mkdir -p PANAV_temp
 		cp  $shifts*.str PANAV_temp
-		java -jar $PANAV PANAV_temp >/dev/null
+		#java -jar $PANAV PANAV_temp >/dev/null
+		{ LIBC_FATAL_STDERR_=1 java -jar $PANAV PANAV_temp 2>/dev/null; } &>/dev/null
 		# check PANAV success
 		if (( $(ls -l PANAV_temp/*_calibrated | wc -l) > 0 )); then 
 			for s in PANAV_temp/*_calibrated; do
@@ -158,12 +163,12 @@ fi
 
 ########## EXTRACT MODELS ##########
 # extract models from pdb
-if [ -f "$extract_NMR" ]; then
+if [ -f "$extract" ]; then
 	echo -n "extracting models from $structure.pdb" | tee -a $log
-	$python_version $extract_NMR $structure.pdb
+	$python_version $extract $structure.pdb $allow_ligands
 else 
     echo " ERROR" | tee -a $log
-    echo " -> could not find $extract_NMR, exiting" | tee -a $log
+    echo " -> could not find $extract, exiting" | tee -a $log
 	exit 1
 fi
 
