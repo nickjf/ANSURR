@@ -21,11 +21,11 @@ To run without re-referencing chemical shifts:
 
 Other options:
 
--h | help 
+-h &nbsp;help 
 
--l  | include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file.
+-l &nbsp;include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file.
 
--n | include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file.
+-n &nbsp;include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file.
 
 ## Output
 
