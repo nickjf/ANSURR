@@ -14,8 +14,8 @@ nonstandardres = []
 freeligands = []
 for line in pdb_in:
     if line[:6] == 'EXPDTA':
-        if 'NMR' not in line:
-            print('this version of ANSURR is only for validated structures solved using SOLUTION NMR')
+        if 'NMR' not in line and 'SOLID' not in line: # some older solution NMR structures just reffered to as NMR
+            print('this version of ANSURR is only for validating structures solved using SOLUTION NMR')
             quit()
     elif line[:5] == 'MODEL':
         model = line.split()[1]
@@ -24,13 +24,19 @@ for line in pdb_in:
         chain = line[21]
         if chain == ' ':
             chain = ''
-        if resn not in standard_res and nonstandard_res == 0 and ter == 0:
-            if resn not in nonstandardres:
-                print("\n -> found a non-standard residue ("+resn+") which are ignored by default. To include non-standard residues re-run ANSURR with the -n flag.",end='')
+        if resn not in standard_res:
+            if resn not in nonstandardres and ter == 0:
+                if nonstandard_res == 0:
+                    print(" -> found a non-standard residue ("+resn+") which are ignored by default. To include non-standard residues re-run ANSURR with the -n flag")
+                else:
+                    print(" -> non-standard residue "+resn+" will be included in rigidity calculations")
                 nonstandardres.append(resn)
-        if resn not in standard_res and free_ligands == 0 and ter == 1:
-            if resn not in freeligands:
-                print("\n -> found a free ligand ("+resn+") which are ignored by default. To include free ligands re-run ANSURR with the -l flag.",end='')
+        if resn not in standard_res:
+            if resn not in freeligands and ter == 1:
+                if free_ligands == 0:
+                    print(" -> found a free ligand ("+resn+") which are ignored by default. To include free ligands re-run ANSURR with the -l flag")
+                else:
+                    print(" -> free ligand "+resn+" will be included in rigidity calculations")
                 freeligands.append(resn)
         if ter == 0 and nonstandard_res == 1:
             pdb_lines.append('ATOM  '+line[6:]) # this labels HETATMS which aren't free ligands as ATOMS so that FIRST recognises them as part of the protein   
@@ -48,6 +54,4 @@ for line in pdb_in:
             out.close()
             pdb_lines = []
             ter = 0
-if len(freeligands) + len(nonstandardres) > 0:
-    print('')
         

@@ -52,11 +52,14 @@ for line in open(shifts,'r'):
     elif details == 1:
         temp.append(line)
 
+out_string = ' -> '+shiftID+'.str split into '
 for e in ents:
     out = open(shiftID+'_'+str(e)+'.str','w')
     for l in ents[e]:
         out.write(l)
     out.close()
+    out_string += shiftID+'_'+str(e)+'.str '
+print(out_string)
 
 
 
