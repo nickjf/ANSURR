@@ -1,7 +1,7 @@
 
 # ANSURR | Accuracy of NMR Structures Using RCI and Rigidity
 
-ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as will be described in our paper (to be submitted soon). This repository contains the code required to install and run ANSURR on a Linux (and possibly Mac) machine. 
+ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as will be described in our paper (under review). This repository contains the code required to install and run ANSURR on a Linux (and possibly Mac) machine. 
 
 ## Installation
 
@@ -18,6 +18,11 @@ ANSURR requires two input files, a NMR protein structure in PDB format and a shi
 To run without re-referencing chemical shifts:
 
 `ansurr -p xxxx.pdb -s xxxx.str`
+
+Other options:
+
+-l inlcude free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file.
+-n include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file.
 
 ## Output
 
@@ -40,7 +45,7 @@ A directory called `<yourpdbfile>_<yourshiftfile>` is made to save the output ge
 
 1. You are asked whether you want to install ANSURR for all users:<br><br> 
 `would you like to install ANSURR for all users? [recommended - requires root privileges] (y/n) `<br><br>
-Answering yes is recommended because then all users on the machine will be able to run ANSURR (obvious), but also you will be able to run ANSURR anywhere by simply typing `ansurr`, without having to place it in your `$PATH`, ammending your `$PATH` or copying the program into the directory you want to run it each time. In order to do this you need root/superuser privileges and so you will likely need to provide your user password for authentication.
+Answering yes is recommended because then all users on the machine will be able to run ANSURR (obvious), but also you will be able to run ANSURR anywhere by simply typing `ansurr`, without having to place it in your `$PATH`, ammending your `$PATH` or copying the program into the directory you want to run it each time. In order to do this you need root/superuser privileges and so you will likely need to provide your password.
 
 2. The program will check your default version of python and ask if you want ANSURR to use that one:<br><br>
 `default version of python on this machine is: python x.x`<br>

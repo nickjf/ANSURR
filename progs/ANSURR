@@ -24,8 +24,8 @@ while getopts ":p:s:hlnr" opt; do
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
 	   #echo " -x | add hydrogens to structure using REDUCE before running ANSURR"
-	   echo " -l | include free ligands when calculating rigidity"
-	   echo " -n | include non-standard residues when calculating rigidity"
+	   echo " -l | include free ligands when calculating flexibility"
+	   echo " -n | include non-standard residues when calculating flexibility"
 	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
 	   exit 1;;
     p) structure="${OPTARG%.*}"
@@ -217,7 +217,7 @@ fi
 
 ########## FIRST ##########
 if [ -f "$FIRST" ]; then
-	echo "calculating rigidity for each model" | tee -a $log
+	echo "calculating flexibility of each model using FIRST" | tee -a $log
 	for pdb in other_output/extracted_pdbs/$structure*.pdb; do 
 		F=$(basename $pdb)
 		pdb_num="${F%.*}"
