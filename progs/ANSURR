@@ -15,14 +15,16 @@ plot2D=$ANSURR_DIR/progs/plot2D.py
 
 ########## ARGS ##########
 run_PANAV=0
-allow_ligands=0
-while getopts ":p:s:hlr" opt; do
+free_ligands=0
+nonstandard_res=0
+while getopts ":p:s:hlnr" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
-	   #echo " -h | add hydrogens to structure using REDUCE before running ANSURR"
-	   echo " -l | include ligands when computing rigidity"
+	   #echo " -x | add hydrogens to structure using REDUCE before running ANSURR"
+	   echo " -l | include free ligands when calculating rigidity"
+	   echo " -n | include non-standard residues when calculating rigidity"
 	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
 	   exit 1;;
     p) structure=$(echo $OPTARG | cut -d'.' -f1)
@@ -40,7 +42,8 @@ while getopts ":p:s:hlr" opt; do
 			echo "shifts file:" $OPTARG | tee -a $log
 	   fi;;
 	r)  run_PANAV=1;;
-	l)  allow_ligands=1;;
+	l)  free_ligands=1;;
+	n)  nonstandard_res=1;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
     :)  echo "Option -$OPTARG requires an argument." >&2
@@ -165,7 +168,7 @@ fi
 # extract models from pdb
 if [ -f "$extract" ]; then
 	echo -n "extracting models from $structure.pdb" | tee -a $log
-	$python_version $extract $structure.pdb $allow_ligands
+	$python_version $extract $structure.pdb $free_ligands $nonstandard_res
 else 
     echo " ERROR" | tee -a $log
     echo " -> could not find $extract, exiting" | tee -a $log
@@ -268,5 +271,4 @@ else
 fi
 
 cd ../
-
-
+exit
