@@ -23,7 +23,7 @@ Other options:
 
 -h | help 
 
--l | include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file.
+-l  | include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file.
 
 -n | include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file.
 
