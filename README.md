@@ -21,11 +21,11 @@ To run without re-referencing chemical shifts:
 
 Other options:
 
--h &nbsp;help 
+-h help 
 
--l &nbsp;include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file.
+-l include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file.
 
--n &nbsp;include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file.
+-n include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file.
 
 ## Output
 
@@ -33,16 +33,16 @@ A directory called `<yourpdbfile>_<yourshiftfile>` is made to save the output ge
 
 * `scores.out` - a text file with the validation scores for each model 
 * `<yourpdbfile>_<yourshiftfile>.png` - a graphical summary of the validation scores for each model 
-* `out/` - contains text files with protein flexibility predicted by RCI and FIRST for each model
-* `figs/` - contains plots of protein flexibility predicted by RCI and FIRST for each model
+* `out/` - text files with protein flexibility predicted by RCI and FIRST for each model
+* `figs/` - plots of protein flexibility predicted by RCI and FIRST for each model
 
 `other_output` contains output from various programs run as part of ANSURR:
 
-* `PANAV/` - contains re-referenced chemical shifts
-* `RCI/` - contains protein flexibility predicted from chemical shifts using the Random Coil Index method
-* `extracted_pdbs/` - contains PDB files for each model extracted from the NMR structure
-* `DSSP/` - contains secondary structure for each model according to the program DSSP
-* `FIRST/` - contains protein flexibility predicted for each model using FIRST
+* `PANAV/` - re-referenced chemical shifts
+* `RCI/` - flexibility predicted from chemical shifts using RCI
+* `extracted_pdbs/` - PDB files for each model extracted from the NMR structure
+* `DSSP/` - secondary structure for each model according to the program DSSP
+* `FIRST/` - flexibility predicted for each model using FIRST
 
 ## Overview of installation instructions
 
