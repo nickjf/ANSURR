@@ -22,7 +22,7 @@ def fix_missing_res(d,report_break):
     for i in d['resi']:
         if i != count:
             if report_break == 1:
-                print('WARNING break in structure at residue '+str(count-1)+' ', end='')
+                print('*WARNING break in structure at residue '+str(count-1)+'* ', end='')
             for k in d:
                 if k == 'resi':
                     d[k].insert(pos,count)
@@ -109,7 +109,7 @@ def align(RCI,FIRST,cut_off=0.5):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_N < cut_off * len(FIRST['resi']):
-            print('ERROR sequence identity is '+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%',end='')
+            print('ERROR sequence identity is '+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%')
             quit()
     else:
         if len(RCI['resi']) <= len(FIRST['resi']):
@@ -125,7 +125,7 @@ def align(RCI,FIRST,cut_off=0.5):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_C < cut_off * len(FIRST['resi']):
-            print('ERROR sequence identity is '+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%',end='')
+            print('ERROR sequence identity is '+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%, which is below cut off of '+str(100*cut_off)+'%')
             quit()
     RCI['resi'] = FIRST['resi']
     return RCI, FIRST
@@ -207,7 +207,6 @@ def rescale_FIRST(FIRST):
     FIRST['score'] = smooth([FIRST['resi'][i] for i,x in enumerate(FIRST['score']) if not np.isnan(x)],[i for i in FIRST['score'] if not np.isnan(i)])
     for n in FIRST_nan:
         FIRST['score'].insert(n,np.nan)
-    #FIRST['score'] = smooth(FIRST['resi'],FIRST['score'])
     return FIRST['score']
 
 def rescale_RCI(RCI_score):
@@ -319,7 +318,7 @@ spearman_noRC = percentileofscore(corr_benchmark,spearmanr(RCI_noRC,FIRST_noRC)[
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
 if av_perc_shifts < 75:
-    print('WARNING chemical shift completeness (' + str(av_perc_shifts) +'%)' +' is below recommended minimum of 75%, RCI values may be unreliable DONE')
+    print('*WARNING chemical shift completeness (' + str(av_perc_shifts) +'%)' +' is below recommended minimum (75%), RCI values may be unreliable* DONE')
 else:
     print('DONE')
 

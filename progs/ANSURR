@@ -168,7 +168,7 @@ else
 fi
 
 # check RCI success
-if (( $(ls -l $shifts*'.rci' | wc -l) > 0 )); then 
+if (( $(ls -l $shifts*'.rci' 2>/dev/null | wc -l) > 0 )); then 
 	mkdir -p other_output/RCI
 	mv $shifts*'.rci' other_output/RCI
 else
@@ -251,7 +251,12 @@ else
 	exit 1
 fi
 
-### need to check whether first ran for anything
+# check for any FIRST output
+count=$(ls -l other_output/FIRST/*/*.decomp 2>/dev/null | wc -l)
+if [ $count == 0 ]; then
+	echo ' -> CRITICAL ERROR FIRST failed to run for any models, exiting' | tee -a $log
+	exit 1
+fi
 
 ########## COMPARE RCI FIRST ##########
 echo "calculating validation scores, output will be saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
@@ -267,7 +272,7 @@ for pdb in other_output/FIRST/$structure*/$structure*.decomp; do
 done
 # check compare success
 count=$(ls -l $structure*'_'*$shifts*'.out' 2>/dev/null | wc -l)
-if [ $count -ne 0 ]; then
+if [ $count -gt 0 ]; then
 	$python_version $plot2D scores.out
 	mkdir -p ANSURR_output/figs
 	mkdir -p ANSURR_output/out
@@ -278,7 +283,8 @@ if [ $count -ne 0 ]; then
 	echo -n "summary of validation scores:"
 	cat ANSURR_output/scores.out
 else
-	echo ' -> CRITICAL ERROR failed to calculate any validation scores' | tee -a $log
+	echo ' -> CRITICAL ERROR failed to calculate any validation scores, exiting' | tee -a $log
+	exit 1
 fi
 
 cd ../

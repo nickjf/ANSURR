@@ -12,18 +12,27 @@ model = '1' # assume first model is model 1
 ter = 0
 nonstandardres = []
 freeligands = []
+chain = ''
+prev_chain = ''
 for line in pdb_in:
     if line[:6] == 'EXPDTA':
         if 'NMR' not in line and 'SOLID' not in line: # some older solution NMR structures just reffered to as NMR
-            print('this version of ANSURR is only for validating structures solved using SOLUTION NMR')
+            print('this version of ANSURR is only for validating structures solved using SOLUTION NMR, exiting')
             quit()
     elif line[:5] == 'MODEL':
         model = line.split()[1]
     elif line[:4] == 'ATOM' or line[:6] == 'HETATM':
         resn = line[17:20]
-        chain = line[21]
-        if chain == ' ':
-            chain = ''
+        chain = '' if chain == ' ' else line[21]
+        #if chain == ' ':
+        #    chain = ''
+        if chain != prev_chain and len(pdb_lines) > 0:
+            out = open(pdb+prev_chain+'_'+model+'.pdb','w')
+            for l in pdb_lines:
+                out.write(l)
+            out.close()
+            pdb_lines = []
+            ter = 0
         if resn not in standard_res:
             if resn not in nonstandardres and ter == 0:
                 if nonstandard_res == 0:
@@ -54,4 +63,5 @@ for line in pdb_in:
             out.close()
             pdb_lines = []
             ter = 0
+    prev_chain = chain
         

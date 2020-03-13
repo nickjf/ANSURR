@@ -24,10 +24,18 @@ temp = []
 details = 0
 ent_specific = {}
 shifts_start = 0
+count_to_entityID = -1 # variable to find where entityID appears in chem list (it can vary e.g for bmrb id 27632 compared to 25660)
+entityID_found = 0
 for line in open(shifts,'r'):
     if "_Assigned_chem_shift_list" in line and details == 0:
         details = 1
         temp.append(line)
+    if "_Atom_chem_shift.ID" in line and shifts_start == 0 and entityID_found == 0:
+        count_to_entityID += 1
+    elif "_Atom_chem_shift.Entity_ID" in line and shifts_start == 0 and entityID_found == 0:
+        entityID_found = 1   
+    if count_to_entityID > -1 and entityID_found == 0:
+        count_to_entityID += 1
     if "_Atom_chem_shift.Assigned_chem_shift_list_ID" in line and shifts_start == 0:
         shifts_start = 1
         temp.append(line)
@@ -40,9 +48,11 @@ for line in open(shifts,'r'):
         details = 0
         ent_specific = {}
         shifts_start = 0
+        count_to_entityID = -1
+        entityID_found = 0
     if details == 1 and shifts_start == 1:
         try:
-            entID = int(line.split()[3])
+            entID = int(line.split()[count_to_entityID])
             if entID not in ent_specific:
                 ent_specific[entID] = [line]
             else:
