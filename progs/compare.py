@@ -16,11 +16,13 @@ def compare_seq(seq1,seq2):
         count += 1
     return score
 
-def fix_missing_res(d):
+def fix_missing_res(d,report_break):
     count = d['resi'][0]
     pos = 0
     for i in d['resi']:
         if i != count:
+            if report_break == 1:
+                print('WARNING break in structure at residue '+str(count-1)+' ', end='')
             for k in d:
                 if k == 'resi':
                     d[k].insert(pos,count)
@@ -47,7 +49,7 @@ def find_breaks(nums):
     breaks = [[n,int(next(iranges))+1] for n in iranges]
     return breaks
 
-def align(RCI,FIRST):
+def align(RCI,FIRST,cut_off=0.5):
     if len(RCI['resn']) <= len(FIRST['resn']): # "a" is always the shorter seq
         a = RCI['resn']
         b = FIRST['resn']
@@ -90,8 +92,7 @@ def align(RCI,FIRST):
             a_score_test.extend([np.nan]*(len(b_score)-len(a_score_test)))
             a_score_test = a_score_test[::-1]
             chosen_i = i
-
-    cut_off = 0.5
+            
     if max_score_N >= max_score_C:
         if len(RCI['resi']) <= len(FIRST['resi']):
             for r in RCI:  
@@ -129,7 +130,7 @@ def align(RCI,FIRST):
     RCI['resi'] = FIRST['resi']
     return RCI, FIRST
 
-def trim(res1,res2):
+def trim(res1,res2): # lazt variable names fix this!
     s = 0
     e = 0
     sc = 0
@@ -202,7 +203,11 @@ def rescale_FIRST(FIRST):
     T = 298.15
     Hartree = 0.00038
     FIRST['score'] = [np.exp((4.2* x * Hartree)*K/T) if not np.isnan(x) else np.nan for x in FIRST['score']]
-    FIRST['score'] = smooth(FIRST['resi'],FIRST['score'])
+    FIRST_nan = [i for i,x in enumerate(FIRST['score']) if np.isnan(x)]
+    FIRST['score'] = smooth([FIRST['resi'][i] for i,x in enumerate(FIRST['score']) if not np.isnan(x)],[i for i in FIRST['score'] if not np.isnan(i)])
+    for n in FIRST_nan:
+        FIRST['score'].insert(n,np.nan)
+    #FIRST['score'] = smooth(FIRST['resi'],FIRST['score'])
     return FIRST['score']
 
 def rescale_RCI(RCI_score):
@@ -286,8 +291,8 @@ for line in rmsd_benchmark_in:
     rmsd_benchmark.append(float(line))
     
 # fix missing residues
-FIRST = fix_missing_res(FIRST)
-RCI = fix_missing_res(RCI)
+FIRST = fix_missing_res(FIRST,1)
+RCI = fix_missing_res(RCI,0)
 
 # align
 RCI,FIRST = align(RCI,FIRST)

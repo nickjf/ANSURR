@@ -79,7 +79,7 @@ log=../$log
 # log file
 log=ANSURR.log
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n------------------------ '$DATE' running ANSURR -------------------------' | tee -a $log
+echo $'\n-------------------------- '$DATE' running ANSURR ---------------------------' | tee -a $log
 
 ########## SPLIT SHIFTS ###########
 
@@ -249,7 +249,7 @@ fi
 echo "calculating validation scores, output will be saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
 mkdir ANSURR_output
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n------------------------- '$DATE' ANSURR output --------------------------'  > scores.out
+echo $'\n--------------------------- '$DATE' ANSURR output ----------------------------'  > scores.out
 for pdb in other_output/FIRST/$structure*/$structure*.decomp; do
 	F=$(basename $pdb)
 	pdb_num="${F%.*}"
@@ -267,7 +267,7 @@ if [ $count -ne 0 ]; then
 	mv $structure*'_'*'_'*$shifts*'.png' ANSURR_output/figs
 	mv $structure*'_'*$shifts*'.out' ANSURR_output/out
 	mv $structure*'_'*$shifts*'.png' ANSURR_output
-	echo "summary of validation scores:"
+	echo -n "summary of validation scores:"
 	cat ANSURR_output/scores.out
 else
 	echo ' -> CRITICAL ERROR failed to calculate any validation scores' | tee -a $log
