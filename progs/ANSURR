@@ -73,11 +73,10 @@ cp $structure.pdb $structure'_'$shifts
 cp $shifts.str $structure'_'$shifts
 cd $structure'_'$shifts
 echo "output dir: "$structure'_'$shifts | tee -a $log
-log=../$log
 
 ########## LOG FILE ##########
 # log file
-log=ANSURR.log
+log=../ANSURR.log
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 echo $'\n-------------------------- '$DATE' running ANSURR ---------------------------' | tee -a $log
 
@@ -85,7 +84,7 @@ echo $'\n-------------------------- '$DATE' running ANSURR ---------------------
 
 entities=$(grep "_Entity.ID" $shifts.str | wc -l)
 if (( $entities > 1 )); then
-	echo "$entities entities found in shifts file"
+	echo "$entities entities found in shifts file" | tee -a $log
 	$python_version $split_shifts $shifts.str | tee -a $log
 	rm $shifts.str
 fi
@@ -152,7 +151,16 @@ if [ -f "$RCI" ]; then
 			fi
 		done
 	else
-		$python_version $RCI $shifts.str 2>/dev/null
+		for s in $shifts*.str; do 
+			F=$(basename $s)
+			echo -n ' -> '"${F%.*}"' ' | tee -a $log
+			$python_version $RCI $s 2>/dev/null
+			if [ -f "${F%.*}".rci ]; then
+				echo "DONE" | tee -a $log
+			else
+				echo "ERROR" | tee -a $log
+			fi
+		done
 	fi
 else 
     echo " -> CRITCIAL ERROR could not find $RCI, exiting" | tee -a $log

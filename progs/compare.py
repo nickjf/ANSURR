@@ -92,7 +92,7 @@ def align(RCI,FIRST,cut_off=0.5):
             a_score_test.extend([np.nan]*(len(b_score)-len(a_score_test)))
             a_score_test = a_score_test[::-1]
             chosen_i = i
-            
+
     if max_score_N >= max_score_C:
         if len(RCI['resi']) <= len(FIRST['resi']):
             for r in RCI:  
@@ -319,7 +319,7 @@ spearman_noRC = percentileofscore(corr_benchmark,spearmanr(RCI_noRC,FIRST_noRC)[
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
 if av_perc_shifts < 75:
-    print('WARNING chemical shift completeness (' + str(av_perc_shifts) +'%)' +' is below recommended minimum of 75%, RCI values may be unreliable', end='')
+    print('WARNING chemical shift completeness (' + str(av_perc_shifts) +'%)' +' is below recommended minimum of 75%, RCI values may be unreliable DONE')
 else:
     print('DONE')
 

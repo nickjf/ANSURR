@@ -30,7 +30,7 @@ CA_correction_D = {"ALA":0.0,"CYS":0.0,"ASP":0.0,"GLU":0.0,"PHE":0.0,"GLY":0.0,"
 CB_correction_D = {"ALA":0.0,"CYS":0.0,"ASP":0.0,"GLU":0.0,"PHE":0.0,"GLY":0.0,"HIS":0.0,"ILE":0.0,"LYS":0.0,"LEU":0.0,"MET":0.0,"ASN":0.0,"PRO":0.0,"GLN":0.0,"ARG":0.0,"SER":0.0,"THR":0.0,"VAL":0.0,"TRP":0.0,"TYR":0.0}  
 N_correction_D = {"ALA":0.0,"CYS":0.0,"ASP":0.0,"GLU":0.0,"PHE":0.0,"GLY":0.0,"HIS":0.0,"ILE":0.0,"LYS":0.0,"LEU":0.0,"MET":0.0,"ASN":0.0,"PRO":0.0,"GLN":0.0,"ARG":0.0,"SER":0.0,"THR":0.0,"VAL":0.0,"TRP":0.0,"TYR":0.0}  
 
-RC_correction = {'HA':[HA_correction_A, HA_correction_B, HA_correction_C, HA_correction_D],'H':[H_correction_A, H_correction_B, H_correction_C, H_correction_D],'CA':[CA_correction_A, CA_correction_B, CA_correction_C, CA_correction_D],'C':[C_correction_A, C_correction_B, C_correction_C, C_correction_D],'N':[N_correction_A, N_correction_B, N_correction_C, N_correction_D]}
+RC_correction = {'HA':[HA_correction_A, HA_correction_B, HA_correction_C, HA_correction_D],'H':[H_correction_A, H_correction_B, H_correction_C, H_correction_D],'CA':[CA_correction_A, CA_correction_B, CA_correction_C, CA_correction_D],'CB':[CB_correction_A, CB_correction_B, CB_correction_C, CB_correction_D],'C':[C_correction_A, C_correction_B, C_correction_C, C_correction_D],'N':[N_correction_A, N_correction_B, N_correction_C, N_correction_D]}
 
 # random coil reference values (Tamiola 2010)
 H_RC = {'CYS': 8.41, 'ASP': 8.217, 'SER': 8.215, 'GLN': 8.258, 'LYS': 8.221, 'ILE': 7.963, 'THR': 8.047, 'PHE': 8.107, 'ASN': 8.366, 'GLY': 8.307, 'HIS': 8.31, 'LEU': 8.088, 'ARG': 8.232, 'TRP': 7.725, 'ALA': 8.158, 'VAL': 8.037, 'GLU': 8.304, 'TYR': 8.026, 'MET': 8.209}

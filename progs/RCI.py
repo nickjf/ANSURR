@@ -47,10 +47,11 @@ def check_version(file_in): # Check PANAV or NMRStarV3
     if '.panav' in file_in.name: # read in PANAV output
         extract_shifts_PANAV(file_in)
     else:
-        for line in file_in:
-            if "_Entry.NMR_STAR_version" in line:
-                extract_shifts_nmrstar3(file_in) # read in NMR-star3
-                break
+        #for line in file_in:
+        #    if "_Entry.NMR_STAR_version" in line:
+        #        extract_shifts_nmrstar3(file_in) # read in NMR-star3
+        #        break
+        extract_shifts_nmrstar3(file_in)
 
 def extract_shifts_PANAV(file_in):
     for line in file_in:
@@ -146,8 +147,8 @@ def average_gly(res):
 
 def correct_shifts(res,neighbour_res,pos): # correct shifts based on position and neighbouring residue
     for s in res.shifts:
-        if s.atom_type != 'CB':
-            s.shift -= RC_correction[s.atom_type][pos][neighbour_res] # I correted exp shifts originally which is wrong, hence the minus sign here to fix
+        #if s.atom_type != 'CB':
+        s.shift -= RC_correction[s.atom_type][pos][neighbour_res] # I correted exp shifts originally which is wrong, hence the minus sign here to fix
         
 def calc_secondary_coil_shifts(res):
     for s in res.shifts: 

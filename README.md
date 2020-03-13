@@ -25,7 +25,7 @@ Other options:
 
 -l include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file. Note that metals are currently not supported and will always be ignored.
 
--n include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would likely make those regions too floppy.
+-n include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would otherwise make those regions too floppy.
 
 ## Output
 
