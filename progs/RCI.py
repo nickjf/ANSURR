@@ -81,24 +81,28 @@ def extract_shifts_PANAV(file_in):
 
 def extract_shifts_nmrstar3(file_in):
     seq = {}
+    seq_labels = []
     while True:
         for line in file_in:
+            if "_Entity_poly_seq." in line:
+                seq_labels.append(line.split('.')[1].strip())
             if "_Entity_poly_seq.Entity_ID" in line:
                 break
         break
-    
     for line in file_in:
         if 'stop_' in line:
             break
         elif line != '\n':
             line = line.split()
-            resn = line[1]
+            resn = line[seq_labels.index('Mon_ID')]
             if resn in amino_acids.values():
-                resi = int(line[2])
+                resi = int(line[seq_labels.index('Num')])
                 seq[resi] = resn
-                
+    labels = []
     while True:
         for line in file_in:
+            if "_Atom_chem_shift." in line:
+                labels.append(line.split('.')[1].strip())
             if "_Atom_chem_shift.Assigned_chem_shift_list_ID" in line:
                 break
         break
@@ -110,11 +114,11 @@ def extract_shifts_nmrstar3(file_in):
             break
         elif line != '\n':
             line = line.split()
-            atom_type = line[7] 
+            atom_type = line[labels.index('Atom_ID')] 
             if atom_type in atoms:
-                resi = int(line[4])
-                resn = line[6]
-                shift = float(line[10])
+                resi = int(line[labels.index('Seq_ID')])
+                resn = line[labels.index('Comp_ID')]
+                shift = float(line[labels.index('Val')])
                 if resn in amino_acids.values():
                     for s in seq:
                         if s == resi:
