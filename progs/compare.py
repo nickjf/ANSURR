@@ -230,6 +230,9 @@ def plot(RCI, FIRST):
     plt.ylim(0,1.05)
     plt.title('structure: ' + PDB_ID + ' shifts: ' + SHIFT_ID + '\n correlation score: ' + str(round(spearman_noRC,1)) +' RMSD score: ' + str(round(RMSD_noRC,1)))
     plt.savefig(PDB_ID+'_'+SHIFT_ID+'.png',dpi=300,bbox_inches='tight')
+
+def all_same(items):
+    return all(x == items[0] for x in items)
     
 # import data
 FIRST_in = open(sys.argv[1],'r')
@@ -314,7 +317,13 @@ RCI_noRC = [x for i,x in enumerate(RCI['score']) if i not in FIRST_nan and not n
 FIRST_noRC = [x for i,x in enumerate(FIRST['score']) if i not in RCI_nan and not np.isnan(x) and RCI['shift_types'][i] != 'RC']
 
 RMSD_noRC =  100.0 - percentileofscore(rmsd_benchmark,calc_RMSD(RCI_noRC,FIRST_noRC))
-spearman_noRC = percentileofscore(corr_benchmark,spearmanr(RCI_noRC,FIRST_noRC)[0])
+
+if all_same(FIRST_noRC) or all_same(RCI_noRC):
+    spearman_noRC = np.nan
+    print('*WARNING Spearman correlation coefficient cannot be determined, setting correlation score to NaN * ',end='')
+else:
+    spearman_noRC = percentileofscore(corr_benchmark,spearmanr(RCI_noRC,FIRST_noRC)[0])
+
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
 if av_perc_shifts < 75:
