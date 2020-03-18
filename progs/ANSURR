@@ -18,15 +18,18 @@ echo ''
 run_PANAV=0
 free_ligands=0
 nonstandard_res=0
-while getopts ":p:s:hlnr" opt; do
+oligomer=0
+while getopts ":p:s:hlnor" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
 	   #echo " -x | add hydrogens to structure using REDUCE before running ANSURR"
-	   echo " -l | include free ligands when calculating flexibility"
-	   echo " -n | include non-standard residues when calculating flexibility"
-	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
+	   echo " -h          | print this help message"
+	   echo " -l          | include free ligands when calculating flexibility"
+	   echo " -n          | include non-standard residues when calculating flexibility"
+	   echo " -o [chains] | combine chains when calculating flexibility, if no argument is provided then all chains are combined into one structure"
+	   echo " -r          | re-reference chemical shifts using PANAV before calculating RCI"
 	   exit 1;;
     p) structure="${OPTARG%.*}"
 	   if [ "$OPTARG" != $structure.pdb ]; then
@@ -42,9 +45,10 @@ while getopts ":p:s:hlnr" opt; do
 	   else 
 			echo "shifts file:" $OPTARG | tee -a $log
 	   fi;;
-	r)  run_PANAV=1;;
 	l)  free_ligands=1;;
 	n)  nonstandard_res=1;;
+	o)  oligomer=1;;
+	r)  run_PANAV=1;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
     :)  echo "Option -$OPTARG requires an argument." >&2
@@ -180,7 +184,7 @@ fi
 # extract models from pdb
 if [ -f "$extract" ]; then
 	echo "extracting models from $structure.pdb" | tee -a $log
-	$python_version $extract $structure.pdb $free_ligands $nonstandard_res
+	$python_version $extract $structure.pdb $free_ligands $nonstandard_res $oligomer
 else 
     echo " -> CRITICAL ERROR could not find $extract, exiting" | tee -a $log
 	exit 1
