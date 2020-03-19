@@ -1,5 +1,24 @@
-import sys
+import sys,pathlib,json
 
+def make_monomers(pdb,chains):
+	model = pdb.split('/')[1].split(chains)[0]
+	num = pdb.split('/')[1].split(chains)[1].replace('_','').replace('.pdb','')
+	prev_chain = 'XXX'
+	for line in open(pdb,'r'):
+		chain = line[21]
+		if prev_chain == 'XXX':
+			prev_chain = chain
+			out = open(model+chain+'_'+num+'.pdb','w')
+			out.write(line)
+		elif chain != prev_chain:
+			out.close()
+			out = open(model+chain+'_'+num+'.pdb','w')
+			out.write(line)
+		else:
+			out.write(line)
+		prev_chain = chain
+	out.close()
+	
 pdb_in = open(sys.argv[1],'r')
 pdb = sys.argv[1].split('.')[0]
 freeligands = int(sys.argv[2])
@@ -75,6 +94,7 @@ for line in pdb_in:
 	prev_chain = chain
 
 chains_done = []
+resi_ref = {}
 for model in models:
 	chains = ''
 	if oligomers == 0:
@@ -85,25 +105,37 @@ for model in models:
 				out.write(l)
 			out.close()
 		if len(chains) > 1 and chains not in chains_done:
-			print(" -> found "+str(len(chains))+" chains, which are extracted seperately by default. To combine chains, re-run ANSURR with the -o flag")
+			print(" -> found "+str(len(chains))+" chains, which are extracted seperately by default. To combine chains when calculating flexibility, re-run ANSURR with the -o flag")
 			chains_done.append(chains)
 	elif oligomers == 1:
+		pathlib.Path("combined").mkdir(parents=True, exist_ok=True)
 		for chain in models[model]:
 			chains += chain
-		out = open(pdb+chains+'_'+model+'.pdb','w')
+		out = open('combined/'+pdb+chains+'_'+model+'.pdb','w')
 		count = 1
 		num = 0
 		prev_resi = -99999
+		resi_ref[model] = {}
 		for chain in models[model]:
+			resi_ref[model][chain] = {'orig_first':int(models[model][chain][0][23:26]),'orig_last':int(models[model][chain][-1][23:26]),'new_first':'','new_last':''}
 			for l in models[model][chain]:
 				resi = int(l[23:26])
 				if resi != prev_resi:
 					num += 1
 				prev_resi = resi
+				if resi_ref[model][chain]['new_first'] == '':
+					resi_ref[model][chain]['new_first'] = num
 				out.write(l[0:6]+format(str(count)," >5s")+l[11:23]+''.join([' ']*(3-len(str(num))))+str(num)+l[26:])
 				count +=1 
+			resi_ref[model][chain]['new_last'] = num
 		out.close()
+		make_monomers('combined/'+pdb+chains+'_'+model+'.pdb',chains)
 		if chains not in chains_done:
-			print(" -> chains "+chains+" combined into a single structure (residues were renumbered) ")	
+			print(" -> chains "+chains+" combined into a single structure to calculate flexibility ")	
 			chains_done.append(chains)
+
+if oligomers == 1:
+	json.dump(resi_ref, open("resi_ref.txt",'w'))
+
+
 

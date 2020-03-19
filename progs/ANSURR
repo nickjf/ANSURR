@@ -10,6 +10,7 @@ extract=$ANSURR_DIR/progs/extract.py
 DSSP=$ANSURR_DIR/progs/dssp-2.0.4-linux-i386
 FIRST=$ANSURR_DIR/progs/calc_rigidity
 rigid_decomp=$ANSURR_DIR/progs/rigid_decomp.py
+split_decomp=$ANSURR_DIR/progs/split_decomp.py
 compare=$ANSURR_DIR/progs/compare.py
 plot2D=$ANSURR_DIR/progs/plot2D.py
 
@@ -28,7 +29,7 @@ while getopts ":p:s:hlnor" opt; do
 	   echo " -h          | print this help message"
 	   echo " -l          | include free ligands when calculating flexibility"
 	   echo " -n          | include non-standard residues when calculating flexibility"
-	   echo " -o [chains] | combine chains when calculating flexibility, if no argument is provided then all chains are combined into one structure"
+	   echo " -o          | combine chains when calculating flexibility (e.g. for dimers)"
 	   echo " -r          | re-reference chemical shifts using PANAV before calculating RCI"
 	   exit 1;;
     p) structure="${OPTARG%.*}"
@@ -195,6 +196,9 @@ count=$(ls -l $structure*'_'*.pdb 2>/dev/null | wc -l)
 if [ $count -gt 0 ]; then
 	mkdir -p other_output/extracted_pdbs
 	mv $structure*'_'*.pdb other_output/extracted_pdbs
+	if (( oligomer == 1 )); then
+		mv combined other_output/extracted_pdbs/
+	fi
 	count=$(ls -l other_output/extracted_pdbs/*.pdb 2>/dev/null | wc -l)
 	echo " -> extracted $count model(s)" | tee -a $log
 else
@@ -230,22 +234,27 @@ fi
 ########## FIRST ##########
 if [ -f "$FIRST" ]; then
 	echo "calculating flexibility of each model using FIRST" | tee -a $log
-	for pdb in other_output/extracted_pdbs/$structure*.pdb; do 
+	if (( oligomer == 1 )); then
+		structures=other_output/extracted_pdbs/combined
+	else
+		structures=other_output/extracted_pdbs
+	fi
+	for pdb in $structures/$structure*.pdb; do 
 		F=$(basename $pdb)
 		pdb_num="${F%.*}"
 		echo -n " -> $pdb_num" | tee -a $log
 		{ LIBC_FATAL_STDERR_=1 $FIRST $pdb $ANSURR_DIR > $pdb_num'_FIRST.log' 2>/dev/null; } &>/dev/null
 		if grep -q "Calculating rigidity" $pdb_num'_FIRST.log'; then
 			echo " DONE" | tee -a $log
-			$python_version $rigid_decomp $pdb other_output/extracted_pdbs/decomp_list
+			$python_version $rigid_decomp $pdb $structures/decomp_list
 			mkdir -p other_output/FIRST/$pdb_num
-			mv $pdb_num'.decomp' other_output/FIRST/$pdb_num
+			mv $pdb_num'.decomp' other_output/FIRST/
 			rm -f $pdb_num'_FIRST.log'
-			rm -f other_output/extracted_pdbs/decomp_list
+			rm -f $structures/decomp_list
 			rm -f tmp.ps
 		else
 			echo " ERROR FIRST did not run succesfully" | tee -a $log
-			rm -f other_output/extracted_pdbs/decomp_list
+			rm -f $structures/decomp_list
 			rm -f $pdb_num'_FIRST.log'
 			rm -f tmp.ps
 		fi
@@ -256,7 +265,7 @@ else
 fi
 
 # check for any FIRST output
-count=$(ls -l other_output/FIRST/*/*.decomp 2>/dev/null | wc -l)
+count=$(ls -l other_output/FIRST/*.decomp 2>/dev/null | wc -l)
 if [ $count == 0 ]; then
 	echo ' -> CRITICAL ERROR FIRST failed to run for any models, exiting' | tee -a $log
 	exit 1
@@ -267,7 +276,17 @@ echo "calculating validation scores, output will be saved to to $structure"_"$sh
 mkdir ANSURR_output
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 echo $'\n--------------------------- '$DATE' ANSURR output ----------------------------'  > scores.out
-for pdb in other_output/FIRST/$structure*/$structure*.decomp; do
+
+if (( $oligomer == 1 )); then
+	for pdb in other_output/FIRST/$structure*.decomp; do
+		$python_version $split_decomp $pdb
+	done
+	rm other_output/FIRST/$structure*.decomp
+	cp -r *.decomp other_output/FIRST/
+	rm *.decomp
+fi
+		
+for pdb in other_output/FIRST/$structure*.decomp; do
 	F=$(basename $pdb)
 	pdb_num="${F%.*}"
 	for s in other_output/RCI/$shifts*.rci; do 
