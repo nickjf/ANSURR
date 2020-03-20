@@ -33,17 +33,18 @@ while getopts ":p:s:hlnor" opt; do
 	   exit 1;;
     p) structure="${OPTARG%.*}"
 	   if [ "$OPTARG" != $structure.pdb ]; then
-			echo "structure file:" $OPTARG", renamed to $structure.pdb" | tee -a $log
+	   	    structure_info="structure file:" $OPTARG", renamed to $structure.pdb" 
 			cp $OPTARG $structure.pdb
 	   else 
-			echo "structure file:" $OPTARG | tee -a $log
-	   fi;;
+			structure_info="structure file:" $OPTARG
+	   fi
+	   echo $structure_info;;
     s) shifts="${OPTARG%.*}"
 	   if [ "$OPTARG" != $shifts.str ]; then
-			echo "shifts file:" $OPTARG", renamed to $shifts.str" | tee -a $log
+			shift_info="shifts file:" $OPTARG", renamed to $shifts.str"
 			cp $OPTARG $shifts.str
 	   else 
-			echo "shifts file:" $OPTARG | tee -a $log
+			shift_info="shifts file:" $OPTARG | tee -a $log
 	   fi;;
 	l)  free_ligands=1;;
 	n)  nonstandard_res=1;;
