@@ -33,19 +33,20 @@ while getopts ":p:s:hlnor" opt; do
 	   exit 1;;
     p) structure="${OPTARG%.*}"
 	   if [ "$OPTARG" != $structure.pdb ]; then
-	   	    structure_info="structure file:" $OPTARG", renamed to $structure.pdb" 
+	   	    structure_info="structure file: $OPTARG, renamed to $structure.pdb" 
 			cp $OPTARG $structure.pdb
 	   else 
-			structure_info="structure file:" $OPTARG
+			structure_info="structure file: $OPTARG"
 	   fi
-	   echo $structure_info;;
+	   echo "$structure_info";;
     s) shifts="${OPTARG%.*}"
 	   if [ "$OPTARG" != $shifts.str ]; then
-			shift_info="shifts file:" $OPTARG", renamed to $shifts.str"
+			shift_info="shifts file: $OPTARG, renamed to $shifts.str"
 			cp $OPTARG $shifts.str
 	   else 
-			shift_info="shifts file:" $OPTARG | tee -a $log
-	   fi;;
+			shift_info="shifts file: $OPTARG"
+	   fi
+	   echo "$shift_info";;
 	l)  free_ligands=1;;
 	n)  nonstandard_res=1;;
 	o)  oligomer=1;;
@@ -59,15 +60,15 @@ done
 
 # pdb and shift file are required
 if [ "x" == "x$structure" ]; then
- 	echo "-p [pdb file] is required" | tee -a $log
+ 	echo "-p [pdb file] is required" 
 	if [ "x" == "x$shifts" ]; then
-  		echo "-s [shifts file] is required" | tee -a $log
+  		echo "-s [shifts file] is required" 
   		exit 1
 	fi
   exit 1
 fi
 if [ "x" == "x$shifts" ]; then
-  echo "-s [shifts file] is required" | tee -a $log
+  echo "-s [shifts file] is required"
   exit 1
 fi
 
@@ -77,13 +78,19 @@ mkdir -p $structure'_'$shifts
 cp $structure.pdb $structure'_'$shifts
 cp $shifts.str $structure'_'$shifts
 cd $structure'_'$shifts
-echo "output dir: "$structure'_'$shifts | tee -a $log
+output_info="output dir: $structure"_"$shifts"
+echo "$output_info"
 
 ########## LOG FILE ##########
 # log file
 log=../ANSURR.log
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 echo $'\n-------------------------- '$DATE' running ANSURR ---------------------------' | tee -a $log
+echo '' >> $log
+echo "$structure_info" >> $log
+echo "$shift_info" >> $log
+echo "$output_info" >> $log
+echo '' >> $log
 
 ########## SPLIT SHIFTS ###########
 
