@@ -25,7 +25,6 @@ while getopts ":p:s:hlnor" opt; do
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
-	   #echo " -x | add hydrogens to structure using REDUCE before running ANSURR"
 	   echo " -h          | print this help message"
 	   echo " -l          | include free ligands when calculating flexibility"
 	   echo " -n          | include non-standard residues when calculating flexibility"
@@ -247,16 +246,14 @@ if [ -f "$FIRST" ]; then
 		if grep -q "Calculating rigidity" $pdb_num'_FIRST.log'; then
 			echo " DONE" | tee -a $log
 			$python_version $rigid_decomp $pdb $structures/decomp_list
-			mkdir -p other_output/FIRST/$pdb_num
+			mkdir -p other_output/FIRST
 			mv $pdb_num'.decomp' other_output/FIRST/
 			rm -f $pdb_num'_FIRST.log'
 			rm -f $structures/decomp_list
-			rm -f tmp.ps
 		else
 			echo " ERROR FIRST did not run succesfully" | tee -a $log
 			rm -f $structures/decomp_list
 			rm -f $pdb_num'_FIRST.log'
-			rm -f tmp.ps
 		fi
 	done
 else
@@ -293,6 +290,7 @@ for pdb in other_output/FIRST/$structure*.decomp; do
 		$python_version $compare $pdb $s other_output/DSSP/$pdb_num.dssp $ANSURR_DIR | tee -a $log
 	done
 done
+rm -f res_ref.txt
 # check compare success
 count=$(ls -l $structure*'_'*$shifts*'.out' 2>/dev/null | wc -l)
 if [ $count -gt 0 ]; then

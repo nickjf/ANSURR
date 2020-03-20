@@ -109,7 +109,7 @@ def align(RCI,FIRST,cut_off=0.5):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_N < cut_off * len(FIRST['resi']):
-            print('ERROR sequence identity ('+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
+            print('sequence identity ('+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
             quit()
     else:
         if len(RCI['resi']) <= len(FIRST['resi']):
@@ -125,7 +125,7 @@ def align(RCI,FIRST,cut_off=0.5):
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         if max_score_C < cut_off * len(FIRST['resi']):
-            print('ERROR sequence identity ('+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
+            print('sequence identity ('+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
             quit()
     RCI['resi'] = FIRST['resi']
     return RCI, FIRST

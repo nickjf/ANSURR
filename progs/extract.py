@@ -6,16 +6,15 @@ def make_monomers(pdb,chains):
 	prev_chain = 'XXX'
 	for line in open(pdb,'r'):
 		chain = line[21]
+		resi = int(line[23:26])
+		orig_resi = resi - resi_ref[num][chain]['new_first'] + resi_ref[num][chain]['orig_first']
 		if prev_chain == 'XXX':
 			prev_chain = chain
 			out = open(model+chain+'_'+num+'.pdb','w')
-			out.write(line)
 		elif chain != prev_chain:
 			out.close()
 			out = open(model+chain+'_'+num+'.pdb','w')
-			out.write(line)
-		else:
-			out.write(line)
+		out.write(line[0:23]+''.join([' ']*(3-len(str(orig_resi))))+str(orig_resi)+line[26:])
 		prev_chain = chain
 	out.close()
 	
