@@ -100,8 +100,11 @@ for model in models:
 		for chain in models[model]:
 			chains += chain
 			out = open(pdb+chain+'_'+model+'.pdb','w')
+			count = 1
 			for l in models[model][chain]:
-				out.write(l)
+				#out.write(l)
+				out.write(l[0:6]+format(str(count)," >5s")+l[11:])
+				count +=1 
 			out.close()
 		if len(chains) > 1 and chains not in chains_done:
 			print(" -> found "+str(len(chains))+" chains, which are extracted seperately by default. To combine chains when calculating flexibility, re-run ANSURR with the -o flag")

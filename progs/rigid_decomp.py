@@ -19,8 +19,9 @@ class res(object):
 # get atom numbers for each CA atom from pdb
 atom_number = 0
 for line in pdb:
-    if line[:4] == 'ATOM':
-        atom_number += 1
+    if line[:4] == 'ATOM' or line[:6] == 'HETATM':
+        atom_number = int(line[6:11])
+        #atom_number += 1
         atom_name = line[12:16].replace(' ','')
         resn = line[17:20].replace(' ','')
         resi = int(line[22:26])

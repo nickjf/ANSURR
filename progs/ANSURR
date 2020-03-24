@@ -192,7 +192,7 @@ fi
 # extract models from pdb
 if [ -f "$extract" ]; then
 	echo "extracting models from $structure.pdb" | tee -a $log
-	$python_version $extract $structure.pdb $free_ligands $nonstandard_res $oligomer
+	$python_version $extract $structure.pdb $free_ligands $nonstandard_res $oligomer | tee -a $log
 else 
     echo " -> CRITICAL ERROR could not find $extract, exiting" | tee -a $log
 	exit 1
@@ -203,7 +203,7 @@ count=$(ls -l $structure*'_'*.pdb 2>/dev/null | wc -l)
 if [ $count -gt 0 ]; then
 	mkdir -p other_output/extracted_pdbs
 	mv $structure*'_'*.pdb other_output/extracted_pdbs
-	if (( oligomer == 1 )); then
+	if (( $oligomer == 1 )); then
 		mv combined other_output/extracted_pdbs/
 	fi
 	count=$(ls -l other_output/extracted_pdbs/*.pdb 2>/dev/null | wc -l)
@@ -241,7 +241,7 @@ fi
 ########## FIRST ##########
 if [ -f "$FIRST" ]; then
 	echo "calculating flexibility of each model using FIRST" | tee -a $log
-	if (( oligomer == 1 )); then
+	if (( $oligomer == 1 )); then
 		structures=other_output/extracted_pdbs/combined
 	else
 		structures=other_output/extracted_pdbs
