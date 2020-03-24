@@ -52,7 +52,7 @@ for line in pdb_in:
 			std_res = 0
 			for line in pdb_lines:
 				resn = line[17:20]
-				if resn in standard_res:
+				if resn in standard_res and line[:4] == 'ATOM':
 					std_res = 1
 					break
 			if std_res == 1:
