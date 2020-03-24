@@ -22,10 +22,10 @@ for line in pdb:
     if line[:4] == 'ATOM' or line[:6] == 'HETATM':
         atom_number = int(line[6:11])
         #atom_number += 1
-        atom_name = line[12:16].replace(' ','')
+        atom_name = line[12:16]#.replace(' ','')
         resn = line[17:20].replace(' ','')
         resi = int(line[22:26])
-        if atom_name == 'CA':
+        if atom_name == ' CA ':
             r = res(resi,resn,atom_number)
 
 # import decomp_list         
