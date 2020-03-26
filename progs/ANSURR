@@ -229,10 +229,12 @@ if [ -f "$DSSP" ]; then
 	for pdb in other_output/extracted_pdbs/$structure*.pdb; do
 		F=$(basename $pdb)
 		pdb_num="${F%.*}"
-		$DSSP -i $pdb -o $pdb_num.temp.dssp
-		sed -n -e '/#/,$p' $pdb_num.temp.dssp | tail -n +2 | cut -c6-11,13-17 | sed -e 's/^[[:space:]]*//' | tr -s ' ' > $pdb_num.dssp
-		mv $pdb_num.dssp other_output/DSSP
-		rm $pdb_num.temp.dssp
+		$DSSP -i $pdb -o $pdb_num.temp.dssp 2>/dev/null 
+		if [ -f "$pdb_num.temp.dssp" ]; then
+       		sed -n -e '/#/,$p' $pdb_num.temp.dssp | tail -n +2 | cut -c6-11,13-17 | sed -e 's/^[[:space:]]*//' | tr -s ' ' > $pdb_num.dssp
+			mv $pdb_num.dssp other_output/DSSP
+			rm $pdb_num.temp.dssp
+	   fi
 	done
 else 
     echo " -> ERROR could not find $DSSP, will continue without determining secondary structure" | tee -a $log
