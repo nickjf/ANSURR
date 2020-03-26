@@ -23,6 +23,7 @@ def fix_missing_res(d,report_break):
         if i != count:
             if report_break == 1:
                 print('*WARNING break in structure at residue '+str(count-1)+'* ', end='')
+                report_break = 2
             for k in d:
                 if k == 'resi':
                     d[k].insert(pos,count)
@@ -30,6 +31,8 @@ def fix_missing_res(d,report_break):
                     d[k].insert(pos,'XXX')
                 else:
                     d[k].insert(pos,np.nan)
+        elif report_break == 2:
+            report_break = 1
         count += 1
         pos += 1
     return d

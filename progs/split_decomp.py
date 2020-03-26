@@ -10,6 +10,7 @@ chains = ''
 for chain in resi_ref[num]:
     chains += chain
     
+
 for chain in resi_ref[num]:
     out = open(decomp_num.split(chains)[0]+chain+'_'+num+'.decomp','w')
     orig_first = resi_ref[num][chain]['orig_first']
@@ -20,5 +21,8 @@ for chain in resi_ref[num]:
         resi= int(line.split()[0]) 
         if resi >= new_first and resi <= new_last:
             out.write(str(resi - new_first + orig_first)+ ' '+line.split()[1]+' '+line.split()[2]+'\n')
-    out.close()
+        if resi == new_last:
+            out.close()
+            break
+    
             

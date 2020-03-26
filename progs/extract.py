@@ -6,7 +6,7 @@ def make_monomers(pdb,chains):
 	prev_chain = 'XXX'
 	for line in open(pdb,'r'):
 		chain = line[21]
-		resi = int(line[23:26])
+		resi = int(line[22:26])
 		orig_resi = resi - resi_ref[num][chain]['new_first'] + resi_ref[num][chain]['orig_first']
 		if prev_chain == 'XXX':
 			prev_chain = chain
@@ -14,7 +14,7 @@ def make_monomers(pdb,chains):
 		elif chain != prev_chain:
 			out.close()
 			out = open(model+chain+'_'+num+'.pdb','w')
-		out.write(line[0:23]+''.join([' ']*(3-len(str(orig_resi))))+str(orig_resi)+line[26:])
+		out.write(line[0:22]+''.join([' ']*(4-len(str(orig_resi))))+str(orig_resi)+line[26:])
 		prev_chain = chain
 	out.close()
 	
@@ -127,18 +127,20 @@ for model in models:
 		out = open('combined/'+pdb+chains+'_'+model+'.pdb','w')
 		count = 1
 		num = 0
-		prev_resi = -99999
 		resi_ref[model] = {}
 		for chain in models[model]:
-			resi_ref[model][chain] = {'orig_first':int(models[model][chain][0][23:26]),'orig_last':int(models[model][chain][-1][23:26]),'new_first':'','new_last':''}
+			prev_resi = -99999
+			resi_ref[model][chain] = {'orig_first':int(models[model][chain][0][22:26]),'orig_last':int(models[model][chain][-1][22:26]),'new_first':'','new_last':''}
 			for l in models[model][chain]:
-				resi = int(l[23:26])
-				if resi != prev_resi:
+				resi = int(l[22:26])
+				if prev_resi != -99999:
+					num += resi - prev_resi
+				else:
 					num += 1
 				prev_resi = resi
 				if resi_ref[model][chain]['new_first'] == '':
 					resi_ref[model][chain]['new_first'] = num
-				out.write(l[0:6]+format(str(count)," >5s")+l[11:23]+''.join([' ']*(3-len(str(num))))+str(num)+l[26:])
+				out.write(l[0:6]+format(str(count)," >5s")+l[11:22]+''.join([' ']*(3-len(str(num))))+str(num)+l[26:])
 				count +=1 
 			resi_ref[model][chain]['new_last'] = num
 		out.close()
