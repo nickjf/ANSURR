@@ -31,7 +31,11 @@ while getopts ":p:s:hlnor" opt; do
 	   echo " -o          | combine chains when calculating flexibility (e.g. for dimers)"
 	   echo " -r          | re-reference chemical shifts using PANAV before calculating RCI"
 	   exit 1;;
-    p) structure="${OPTARG%.*}"
+    p) if [ ! -f "$OPTARG" ]; then
+       		echo "$OPTARG does not exist, exiting"
+       		exit 1
+	   fi
+	   structure="${OPTARG%.*}"
 	   if [ "$OPTARG" != $structure.pdb ]; then
 	   	    structure_info="structure file: $OPTARG, renamed to $structure.pdb" 
 			cp $OPTARG $structure.pdb
@@ -39,7 +43,11 @@ while getopts ":p:s:hlnor" opt; do
 			structure_info="structure file: $OPTARG"
 	   fi
 	   echo "$structure_info";;
-    s) shifts="${OPTARG%.*}"
+    s) if [ ! -f "$OPTARG" ]; then
+       		echo "$OPTARG does not exist, exiting"
+       		exit 1
+	   fi
+	   shifts="${OPTARG%.*}"
 	   if [ "$OPTARG" != $shifts.str ]; then
 			shift_info="shifts file: $OPTARG, renamed to $shifts.str"
 			cp $OPTARG $shifts.str
