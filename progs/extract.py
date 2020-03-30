@@ -1,19 +1,18 @@
 import sys,pathlib,json
 
-def make_monomers(pdb,chains):
-	model = pdb.split('/')[1].split(chains)[0]
-	num = pdb.split('/')[1].split(chains)[1].replace('_','').replace('.pdb','')
+def make_monomers(pdbid,chains,model):
+	pdb = 'combined/'+pdbid+chains+'_'+model+'.pdb'
 	prev_chain = 'XXX'
 	for line in open(pdb,'r'):
 		chain = line[21]
 		resi = int(line[22:26])
-		orig_resi = resi - resi_ref[num][chain]['new_first'] + resi_ref[num][chain]['orig_first']
+		orig_resi = resi - resi_ref[model][chain]['new_first'] + resi_ref[model][chain]['orig_first']
 		if prev_chain == 'XXX':
 			prev_chain = chain
-			out = open(model+chain+'_'+num+'.pdb','w')
+			out = open(pdbid+chain+'_'+model+'.pdb','w')
 		elif chain != prev_chain:
 			out.close()
-			out = open(model+chain+'_'+num+'.pdb','w')
+			out = open(pdbid+chain+'_'+model+'.pdb','w')
 		out.write(line[0:22]+''.join([' ']*(4-len(str(orig_resi))))+str(orig_resi)+line[26:])
 		prev_chain = chain
 	out.close()
@@ -144,7 +143,7 @@ for model in models:
 				count +=1 
 			resi_ref[model][chain]['new_last'] = num
 		out.close()
-		make_monomers('combined/'+pdb+chains+'_'+model+'.pdb',chains)
+		make_monomers(pdb,chains,model)
 		if chains not in chains_done:
 			print(" -> chains "+chains+" combined into a single structure to calculate flexibility ")	
 			chains_done.append(chains)

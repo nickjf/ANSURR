@@ -294,7 +294,7 @@ echo $'\n--------------------------- '$DATE' ANSURR output ---------------------
 
 if (( $oligomer == 1 )); then
 	for pdb in other_output/FIRST/$structure*.decomp; do
-		$python_version $split_decomp $pdb
+		$python_version $split_decomp $pdb $structure
 	done
 	rm other_output/FIRST/$structure*.decomp
 	cp -r *.decomp other_output/FIRST/

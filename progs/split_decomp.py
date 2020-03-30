@@ -12,7 +12,7 @@ for chain in resi_ref[num]:
     
 
 for chain in resi_ref[num]:
-    out = open(decomp_num.split(chains)[0]+chain+'_'+num+'.decomp','w')
+    out = open(sys.argv[2]+chain+'_'+num+'.decomp','w')
     orig_first = resi_ref[num][chain]['orig_first']
     orig_last = resi_ref[num][chain]['orig_last']
     new_first = resi_ref[num][chain]['new_first']
