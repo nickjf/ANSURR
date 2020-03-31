@@ -138,7 +138,7 @@ for model in models:
 				prev_resi = resi
 				if resi_ref[model][chain]['new_first'] == '':
 					resi_ref[model][chain]['new_first'] = num
-				out.write(l[0:6]+format(str(count)," >5s")+l[11:22]+''.join([' ']*(3-len(str(num))))+str(num)+l[26:])
+				out.write(l[0:6]+format(str(count)," >5s")+l[11:22]+''.join([' ']*(4-len(str(num))))+str(num)+l[26:])
 				count +=1 
 			resi_ref[model][chain]['new_last'] = num
 		out.close()
