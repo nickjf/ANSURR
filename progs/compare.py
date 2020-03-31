@@ -111,8 +111,9 @@ def align(RCI,FIRST,cut_off=0.5):
                 FIRST[f] = FIRST[f][::-1]   
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
-        if max_score_N < cut_off * len(FIRST['resi']):
-            print('sequence identity ('+str(round(100*max_score_N/(len(FIRST['resi'])),1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
+        num_resn = len([i for i in FIRST['resn'] if i != 'XXX'])
+        if max_score_N < cut_off * num_resn:
+            print('sequence identity ('+str(round(100*max_score_N/num_resn,1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
             quit()
     else:
         if len(RCI['resi']) <= len(FIRST['resi']):
@@ -127,8 +128,9 @@ def align(RCI,FIRST,cut_off=0.5):
                 FIRST[f] = FIRST[f][::-1]
                 FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
-        if max_score_C < cut_off * len(FIRST['resi']):
-            print('sequence identity ('+str(round(100*max_score_C/(len(FIRST['resi'])),1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
+        num_resn = len([i for i in FIRST['resn'] if i != 'XXX'])
+        if max_score_C < cut_off * num_resn:
+            print('sequence identity ('+str(round(100*max_score_C/num_resn,1))+'%) is below cut-off ('+str(100*cut_off)+'%), skipping')
             quit()
     RCI['resi'] = FIRST['resi']
     return RCI, FIRST
@@ -182,8 +184,15 @@ def smooth(resi,data):
     data_smoothed = []
     segs = get_segments(resi)
     for s in segs:
-        if len(s) > 1:
+        if len(s) > 2:
             data_smoothed_temp = movingaverage(data[s[0]:s[1]+1],3)
+            N = (data[s[0]] + data[s[0]+1]) / 2.0
+            data_smoothed_temp[0] = N
+            C = (data[s[1]] + data[s[1]-1]) / 2.0
+            data_smoothed_temp[-1] = C
+            data_smoothed.extend(data_smoothed_temp)
+        elif len(s) == 2:
+            data_smoothed_temp = movingaverage(data[s[0]:s[1]+1],2)
             N = (data[s[0]] + data[s[0]+1]) / 2.0
             data_smoothed_temp[0] = N
             C = (data[s[1]] + data[s[1]-1]) / 2.0
@@ -212,7 +221,7 @@ def rescale_FIRST(FIRST):
         FIRST['score'].insert(n,np.nan)
     return FIRST['score']
 
-def rescale_RCI(RCI_score):
+def rescale_RCI(RCI_score): 
     offset = 0.024
     scale = 0.2-0.024
     RCI_score = [min(max((i-offset)/scale,0.0),1.0) for i in RCI_score]

@@ -112,7 +112,6 @@ for model in models:
 			out = open(pdb+chain+'_'+model+'.pdb','w')
 			count = 1
 			for l in models[model][chain]:
-				#out.write(l)
 				out.write(l[0:6]+format(str(count)," >5s")+l[11:])
 				count +=1 
 			out.close()
