@@ -102,6 +102,78 @@ for line in pdb_in:
 						models[model][chain].extend(selected_pdb_lines[chain])
 			pdb_lines = {}
 
+if len(pdb_lines) > 0:   # this should catch strucutres which don't end in TER or END, i.e. from output of some software
+	selected_pdb_lines = {}
+	for chain in pdb_lines:
+		std_res = 0
+		for line in pdb_lines[chain]:
+			resn = line[17:20]
+			if resn in standard_res and line[:4] == 'ATOM':
+				std_res = 1
+				break
+		if std_res == 1:
+			for line in pdb_lines[chain]:
+				resn = line[17:20]
+				if resn in standard_res:
+					if chain not in selected_pdb_lines:
+						selected_pdb_lines[chain] = [line]
+					else:
+						selected_pdb_lines[chain].append(line)
+				elif nonstandardres == 1:
+					if chain not in selected_pdb_lines:
+						selected_pdb_lines[chain] = ['ATOM  '+line[6:]]
+					else:
+						selected_pdb_lines[chain].append('ATOM  '+line[6:])
+					if resn not in nonstandard:
+						print(" -> non-standard residue "+resn.replace(' ','')+" will be included in rigidity calculations")
+						nonstandard.append(resn)
+				else:
+					if resn not in nonstandard:
+						print(" -> found a non-standard residue ("+resn.replace(' ','')+") which are ignored by default. To include non-standard residues, re-run ANSURR with the -n flag")
+						nonstandard.append(resn)
+		else:
+			for line in pdb_lines[chain]:
+				resn = line[17:20]
+				if freeligands == 1:
+					if chain not in selected_pdb_lines:
+						selected_pdb_lines[chain] = [line]
+					else:
+						selected_pdb_lines[chain].append(line)
+					if resn not in nonstandard:
+						print(" -> free ligand "+resn.replace(' ','')+" will be included in rigidity calculations")
+						nonstandard.append(resn)
+				else:
+					if resn not in nonstandard:
+						print(" -> found a free ligand ("+resn.replace(' ','')+") which are ignored by default. To include free ligands, re-run ANSURR with the -l flag")
+						nonstandard.append(resn)
+	for chain in selected_pdb_lines:
+		if len(selected_pdb_lines[chain]) > 0:
+			if model not in models:  
+				models[model] = {chain:selected_pdb_lines[chain]}
+			elif chain not in models[model]:
+				models[model][chain] = selected_pdb_lines[chain]
+			else:
+				models[model][chain].extend(selected_pdb_lines[chain])
+
+
+for model in models: # this orders by resi number as sometimes pdbs are not ordered correctly (e.g. pdb 2lrl)
+	for chain in models[model]:
+		pdb_lines = models[model][chain]
+		resi_pdb_lines = {}
+
+		for line in pdb_lines:
+		    resi = int(line[22:26])
+		    if resi not in resi_pdb_lines:
+		        resi_pdb_lines[resi] = [line]
+		    else:
+		        resi_pdb_lines[resi].append(line)
+		sorted_resi_pdb_lines = {}
+		for key in sorted(resi_pdb_lines.keys()) :
+		    sorted_resi_pdb_lines[key] = resi_pdb_lines[key]    
+
+		pdb_lines = [sorted_resi_pdb_lines[i] for i in sorted_resi_pdb_lines]
+		models[model][chain] =  [item for sublist in pdb_lines for item in sublist]
+
 chains_done = []
 resi_ref = {}
 for model in models:
@@ -138,7 +210,7 @@ for model in models:
 				prev_resi = resi
 				if resi_ref[model][chain]['new_first'] == '':
 					resi_ref[model][chain]['new_first'] = num
-				out.write(l[0:6]+format(str(count)," >5s")+l[11:22]+''.join([' ']*(4-len(str(num))))+str(num)+l[26:])
+				out.write(l[0:6]+format(str(count)," >5s")+l[11:22]+''.join([' ']*(4-len(str(num))))+str(num)+l[26:].replace('\n','')+'\n') #this makes sure there is a single new line char at end (needed for FIRST to run correctly)
 				count +=1 
 			resi_ref[model][chain]['new_last'] = num
 		out.close()
