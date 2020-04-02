@@ -148,7 +148,7 @@ if [ $run_PANAV == 1 ]; then
 			mkdir -p other_output/PANAV
 			mv $shifts*'.panav' other_output/PANAV
 		else
-			echo " -> ERROR PANAV did not run succesfully for any shift files, will proceed without re-referencing chemical shifts" | tee -a $log
+			echo " -> ERROR PANAV did not run successfully for any shift files, will proceed without re-referencing chemical shifts" | tee -a $log
 			run_PANAV=0
 			rm -rf PANAV_temp
 		fi
@@ -269,7 +269,7 @@ if [ -f "$FIRST" ]; then
 			rm -f $pdb_num'_FIRST.log'
 			rm -f $structures/decomp_list
 		else
-			echo " ERROR FIRST did not run succesfully" | tee -a $log
+			echo " ERROR FIRST did not run successfully" | tee -a $log
 			rm -f $structures/decomp_list
 			rm -f $pdb_num'_FIRST.log'
 		fi
