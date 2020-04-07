@@ -23,11 +23,11 @@ Options:
 
 `-h` print help message 
 
-`-l` include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file. Note that metals are currently not supported and will be ignored when computing flexibility.
+`-l` (Under development) include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file. Note that metals are currently not supported and will be ignored when computing flexibility. 
 
-`-n` include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would otherwise make those regions too floppy.
+`-n` (Under development) include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would otherwise make those regions too floppy.
 
-`-o` combine chains into a single structure when calculating flexibility. This is useful when the structure is an oligomer as oligomerisation will often result in changes in flexibility. Currently this option combines all chains present in the pdb file. A future release will allow you to choose which of the chains should be combined. 
+`-o` (Under development) combine chains into a single structure when calculating flexibility. This is useful when the structure is an oligomer as oligomerisation will often result in changes in flexibility. Currently this option combines all chains present in the pdb file. A future release will allow you to choose which of the chains should be combined. 
 
 `-r` re-reference chemical shifts using PANAV before running ANSURR
 
