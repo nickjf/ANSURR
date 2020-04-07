@@ -1,7 +1,7 @@
 
 import json, sys
 
-resi_ref = json.load(open("resi_ref.txt"))
+resi_ref = json.load(open("resi_ref.tmp"))
 decomp = sys.argv[1]
 decomp_num = sys.argv[1].split('/')[-1]
 num = decomp.split('.decomp')[0].split('_')[-1]

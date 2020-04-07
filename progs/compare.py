@@ -22,7 +22,7 @@ def fix_missing_res(d,report_break):
     for i in d['resi']:
         if i != count:
             if report_break == 1:
-                print('*WARNING break in structure at residue '+str(count-1)+'* ', end='')
+                print('*WARNING break at resi '+str(count-1)+'* ', end='')
                 report_break = 2
             for k in d:
                 if k == 'resi':

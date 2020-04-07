@@ -9,27 +9,28 @@ RCI=$ANSURR_DIR/progs/RCI.py
 extract=$ANSURR_DIR/progs/extract.py
 DSSP=$ANSURR_DIR/progs/dssp-2.0.4-linux-i386
 FIRST=$ANSURR_DIR/progs/calc_rigidity
+FIRST_bonds=$ANSURR_DIR/progs/calc_rigidity_hb
 rigid_decomp=$ANSURR_DIR/progs/rigid_decomp.py
 split_decomp=$ANSURR_DIR/progs/split_decomp.py
 compare=$ANSURR_DIR/progs/compare.py
 plot2D=$ANSURR_DIR/progs/plot2D.py
 
 ########## ARGS ##########
-echo ''
 run_PANAV=0
+bonds=0
 free_ligands=0
 nonstandard_res=0
 oligomer=0
-while getopts ":p:s:hlnor" opt; do
+while getopts ":p:s:bhlnor" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
-	   echo " -h          | print this help message"
-	   echo " -l          | include free ligands when calculating flexibility"
-	   echo " -n          | include non-standard residues when calculating flexibility"
-	   echo " -o          | combine chains when calculating flexibility (e.g. for dimers)"
-	   echo " -r          | re-reference chemical shifts using PANAV before calculating RCI"
+	   echo " -h | print this help message"
+	   echo " -l | include free ligands when calculating flexibility"
+	   echo " -n | include non-standard residues when calculating flexibility"
+	   echo " -o | combine chains when calculating flexibility (e.g. for dimers)"
+	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
 	   exit 1;;
     p) if [ ! -f "$OPTARG" ]; then
        		echo "$OPTARG does not exist, exiting"
@@ -55,6 +56,7 @@ while getopts ":p:s:hlnor" opt; do
 			shift_info="shifts file: $OPTARG"
 	   fi
 	   echo "$shift_info";;
+	b)  bonds=1;;
 	l)  free_ligands=1;;
 	n)  nonstandard_res=1;;
 	o)  oligomer=1;;
@@ -212,7 +214,11 @@ if [ $count -gt 0 ]; then
 	mkdir -p other_output/extracted_pdbs
 	mv $structure*'_'*.pdb other_output/extracted_pdbs
 	if (( $oligomer == 1 )); then
-		mv combined other_output/extracted_pdbs/
+		if [[ -d "combined" ]]; then
+			mv combined other_output/extracted_pdbs/
+		else
+			oligomer=0
+		fi
 	fi
 	count=$(ls -l other_output/extracted_pdbs/*.pdb 2>/dev/null | wc -l)
 	echo " -> extracted $count model(s)" | tee -a $log
@@ -260,7 +266,11 @@ if [ -f "$FIRST" ]; then
 		F=$(basename $pdb)
 		pdb_num="${F%.*}"
 		echo -n " -> $pdb_num" | tee -a $log
-		{ LIBC_FATAL_STDERR_=1 $FIRST $pdb $ANSURR_DIR > $pdb_num'_FIRST.log' 2>/dev/null; } &>/dev/null
+		if [ $bonds == 1 ]; then
+			{ LIBC_FATAL_STDERR_=1 $FIRST_bonds $pdb $ANSURR_DIR > $pdb_num'_FIRST.log' 2>/dev/null; } &>/dev/null # this only works if you have hbonds.in file to read in, currently no way to get that
+		else
+			{ LIBC_FATAL_STDERR_=1 $FIRST $pdb $ANSURR_DIR > $pdb_num'_FIRST.log' 2>/dev/null; } &>/dev/null
+		fi
 		if grep -q "Calculating rigidity" $pdb_num'_FIRST.log'; then
 			echo " DONE" | tee -a $log
 			$python_version $rigid_decomp $pdb $structures/decomp_list
@@ -308,7 +318,7 @@ for pdb in other_output/FIRST/$structure*.decomp; do
 		$python_version $compare $pdb $s other_output/DSSP/$pdb_num.dssp $ANSURR_DIR | tee -a $log
 	done
 done
-rm -f resi_ref.txt
+rm -f resi_ref.tmp
 # check compare success
 count=$(ls -l $structure*'_'*$shifts*'.out' 2>/dev/null | wc -l)
 if [ $count -gt 0 ]; then
