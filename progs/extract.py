@@ -4,17 +4,18 @@ def make_monomers(pdbid,chains,model):
 	pdb = 'combined/'+pdbid+chains+'_'+model+'.pdb'
 	prev_chain = 'XXX'
 	for line in open(pdb,'r'):
-		chain = line[21]
-		resi = int(line[22:26])
-		orig_resi = resi - resi_ref[model][chain]['new_first'] + resi_ref[model][chain]['orig_first']
-		if prev_chain == 'XXX':
+		if 'ATOM' in line[:4] or 'HETATM' in line[:6]:
+			chain = line[21]
+			resi = int(line[22:26])
+			orig_resi = resi - resi_ref[model][chain]['new_first'] + resi_ref[model][chain]['orig_first']
+			if prev_chain == 'XXX':
+				prev_chain = chain
+				out = open(pdbid+chain+'_'+model+'.pdb','w')
+			elif chain != prev_chain:
+				out.close()
+				out = open(pdbid+chain+'_'+model+'.pdb','w')
+			out.write(line[0:22]+''.join([' ']*(4-len(str(orig_resi))))+str(orig_resi)+line[26:])
 			prev_chain = chain
-			out = open(pdbid+chain+'_'+model+'.pdb','w')
-		elif chain != prev_chain:
-			out.close()
-			out = open(pdbid+chain+'_'+model+'.pdb','w')
-		out.write(line[0:22]+''.join([' ']*(4-len(str(orig_resi))))+str(orig_resi)+line[26:])
-		prev_chain = chain
 	out.close()
 
 def parse_pdb_lines(pdb_lines):
@@ -134,6 +135,7 @@ for model in models: # this orders by resi number as sometimes pdbs are not orde
 
 chains_done = []
 resi_ref = {}
+old_new_atom_num = {} # 
 for model in models:
 	chains = ''
 	if oligomers == 1:
@@ -149,6 +151,7 @@ for model in models:
 				prev_resi = -99999
 				resi_ref[model][chain] = {'orig_first':int(models[model][chain][0][22:26]),'orig_last':int(models[model][chain][-1][22:26]),'new_first':'','new_last':''}
 				for l in models[model][chain]:
+					old_new_atom_num[l[6:11].strip()] = str(count)
 					resi = int(l[22:26])
 					if prev_resi != -99999:
 						num += resi - prev_resi
@@ -160,6 +163,15 @@ for model in models:
 					out.write(l[0:6]+format(str(count)," >5s")+l[11:22]+''.join([' ']*(4-len(str(num))))+str(num)+l[26:].replace('\n','')+'\n') #this makes sure there is a single new line char at end (needed for FIRST to run correctly)
 					count +=1 
 				resi_ref[model][chain]['new_last'] = num
+			out.write('END\n')
+			for c in conect:
+				print(c)
+				corrected_c = ''
+				for i in c.split()[1:]:
+					if i in old_new_atom_num:
+						corrected_c += ' '+old_new_atom_num[i]
+				if len(corrected_c.split()) > 1:
+					out.write('CONECT '+corrected_c+'\n')
 			out.close()
 			make_monomers(pdb,chains,model)
 			if chains not in chains_done:
@@ -174,13 +186,23 @@ for model in models:
 			out = open(pdb+chain+'_'+model+'.pdb','w')
 			count = 1
 			for l in models[model][chain]:
+				old_new_atom_num[l[6:11].strip()] = str(count)
 				out.write(l[0:6]+format(str(count)," >5s")+l[11:])
 				count +=1 
+			out.write('END\n')
+			for c in conect:
+				corrected_c = ''
+				for i in c.split()[1:]:
+					if i in old_new_atom_num:
+						corrected_c += ' '+old_new_atom_num[i]
+				if len(corrected_c.split()) > 1:
+					out.write('CONECT '+corrected_c+'\n')
 			out.close()
 		if len(chains) > 1 and chains not in chains_done:
 			print(" -> found "+str(len(chains))+" chains, which are extracted seperately by default. To combine chains when calculating flexibility, re-run ANSURR with the -o flag")
 			chains_done.append(chains)
-
+if len(conect) > 0:
+	print(" -> found CONECT records")
 if oligomers == 1:
 	json.dump(resi_ref, open("resi_ref.tmp",'w'))
 
