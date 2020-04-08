@@ -165,7 +165,6 @@ for model in models:
 				resi_ref[model][chain]['new_last'] = num
 			out.write('END\n')
 			for c in conect:
-				print(c)
 				corrected_c = ''
 				for i in c.split()[1:]:
 					if i in old_new_atom_num:
