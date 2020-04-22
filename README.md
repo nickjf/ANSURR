@@ -21,11 +21,13 @@ To run without re-referencing chemical shifts:
 
 Options:
 
-`-h` print help message 
+`-b` (under development) read in extra covalent bonds from CONECT recoords in the PDB file. FIRST will identify most covalent bonds but not metal-ligand bonds. This option allows you to add these in by specifying them as CONECT records (for details on how to add these to your PDB file see here: https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html). Note that CONECT recoords are automatically generated for structures deposited to the PDB, so may not be correct.
 
-`-l` (under development) include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in a pdb file. Note that metals are currently not supported and will be ignored when computing flexibility. 
+`-h` print the help message 
 
-`-n` (under development) include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in a pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would otherwise make those regions too floppy.
+`-l` (under development) include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in the PDB file. Note that metals will generally not be bonded unless specified as CONECT records (see option -b). 
+
+`-n` (under development) include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in the pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would otherwise make those regions too floppy.
 
 `-o` (under development) combine chains into a single structure when calculating flexibility. This is useful when the structure is an oligomer as oligomerisation will often result in changes in flexibility. Currently this option combines all chains present in the pdb file. A future release will allow you to choose which of the chains should be combined. 
 

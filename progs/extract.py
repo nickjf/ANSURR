@@ -81,6 +81,7 @@ if sys.argv[4] == '1':
 	oligomers = 1
 else:
 	oligomers = 0
+conects = int(sys.argv[5])
 
 standard_res = ['ALA','CYS','ASP','GLU','PHE','GLY','HIS','ILE','LYS','LEU','MET','ASN','PRO','GLN','ARG','SER','THR','VAL','TRP','TYR']
 
@@ -108,7 +109,7 @@ for line in pdb_in:
 		if len(pdb_lines) > 0:   
 			models = parse_pdb_lines(pdb_lines)
 			pdb_lines = {}
-	elif 'CONECT'in line[:6]:
+	elif 'CONECT'in line[:6] and conects == 1:
 		conect.append(line)
 
 if len(pdb_lines) > 0:   # catch any extra stuff in case structure doesn't end with TER or END, e.g. for CNS output
@@ -201,7 +202,7 @@ for model in models:
 			print(" -> found "+str(len(chains))+" chains, which are extracted seperately by default. To combine chains when calculating flexibility, re-run ANSURR with the -o flag")
 			chains_done.append(chains)
 if len(conect) > 0:
-	print(" -> found CONECT records")
+	print(" -> read in "+str(len(conect))+" CONECT records")
 if oligomers == 1:
 	json.dump(resi_ref, open("resi_ref.tmp",'w'))
 

@@ -19,11 +19,13 @@ run_PANAV=0
 free_ligands=0
 nonstandard_res=0
 oligomer=0
-while getopts ":p:s:hlnor" opt; do
+bonds=0
+while getopts ":p:s:bhlnor" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
+	   echo " -b | read in extra covalent bonds from CONECT recoords in the structure file"
 	   echo " -h | print this help message"
 	   echo " -l | include free ligands when calculating flexibility"
 	   echo " -n | include non-standard residues when calculating flexibility"
@@ -54,6 +56,7 @@ while getopts ":p:s:hlnor" opt; do
 			shift_info="shifts file: $OPTARG"
 	   fi
 	   echo "$shift_info";;
+	b)  bonds=1;;
 	l)  free_ligands=1;;
 	n)  nonstandard_res=1;;
 	o)  oligomer=1;;
@@ -199,7 +202,7 @@ fi
 # extract models from pdb
 if [ -f "$extract" ]; then
 	echo "extracting models from $structure.pdb" | tee -a $log
-	$python_version $extract $structure.pdb $free_ligands $nonstandard_res $oligomer | tee -a $log
+	$python_version $extract $structure.pdb $free_ligands $nonstandard_res $oligomer $bonds | tee -a $log
 else 
     echo " -> CRITICAL ERROR could not find $extract, exiting" | tee -a $log
 	exit 1
