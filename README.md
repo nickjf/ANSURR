@@ -21,11 +21,11 @@ To run without re-referencing chemical shifts:
 
 Options:
 
-`-b` (under development) read in extra covalent bonds from CONECT recoords in the PDB file. FIRST will identify most covalent bonds but not metal-ligand bonds. This option allows you to add these in by specifying them as CONECT records (for details on how to add these to your PDB file see here: https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html). Note that CONECT recoords are automatically generated for structures deposited to the PDB, so may not be correct.
+`-b` (under development) read in extra covalent bonds from CONECT recoords in the PDB file. FIRST will identify most covalent bonds but not metal-ligand bonds. This option allows you to add these in by specifying them in CONECT records (for details on how to add these to your PDB file see here: https://www.wwpdb.org/documentation/file-format-content/format33/sect10.html). Note that CONECT recoords are automatically generated for structures deposited to the PDB, so may not be correct.
 
 `-h` print the help message 
 
-`-l` (under development) include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in the PDB file. Note that metals will generally not be bonded unless specified as CONECT records (see option -b). 
+`-l` (under development) include free ligands when computing flexibility. Free ligands are defined as HETATMs that appear after the TER record in the PDB file. Note that metals will generally not be bonded unless specified in CONECT records (see option -b). 
 
 `-n` (under development) include non-standard resdiues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in the pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would otherwise make those regions too floppy.
 
