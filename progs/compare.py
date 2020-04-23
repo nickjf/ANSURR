@@ -240,7 +240,7 @@ def plot(RCI, FIRST):
     plt.xlabel('residue number',size=12)
     plt.ylabel('flexibility',size=12)
     plt.ylim(0,1.05)
-    plt.title('structure: ' + PDB_ID + ' shifts: ' + SHIFT_ID + '\n correlation score: ' + str(round(spearman_noRC,1)) +' RMSD score: ' + str(round(RMSD_noRC,1)))
+    plt.title('structure: ' + PDB_ID + ' shifts: ' + SHIFT_ID + ' shift%: '+av_perc_shifts_out+'\n correlation score: ' + str(round(corr_score,1)) +' RMSD score: ' + str(round(RMSD_score,1)))
     plt.savefig(PDB_ID+'_'+SHIFT_ID+'.png',dpi=300,bbox_inches='tight')
 
 def all_same(items):
@@ -328,19 +328,24 @@ FIRST_nan = [i for i,x in enumerate(FIRST['score']) if np.isnan(x)]
 RCI_noRC = [x for i,x in enumerate(RCI['score']) if i not in FIRST_nan and not np.isnan(x) and RCI['shift_types'][i] != 'RC']
 FIRST_noRC = [x for i,x in enumerate(FIRST['score']) if i not in RCI_nan and not np.isnan(x) and RCI['shift_types'][i] != 'RC']
 
-RMSD_noRC =  100.0 - percentileofscore(rmsd_benchmark,calc_RMSD(RCI_noRC,FIRST_noRC))
+RMSD_noRC =  calc_RMSD(RCI_noRC,FIRST_noRC)
+RMSD_score = 100.0 - percentileofscore(rmsd_benchmark,RMSD_noRC)
 
 if all_same(FIRST_noRC) or all_same(RCI_noRC):
     spearman_noRC = np.nan
+    corr_score = np.nan
     print('*WARNING Spearman correlation coefficient cannot be determined, setting correlation score to NaN * ',end='')
 else:
-    spearman_noRC = percentileofscore(corr_benchmark,spearmanr(RCI_noRC,FIRST_noRC)[0])
+    spearman_noRC = spearmanr(RCI_noRC,FIRST_noRC)[0]
+    corr_score = percentileofscore(corr_benchmark,spearman_noRC)
 
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
 if av_perc_shifts < 75:
-    print('*WARNING chemical shift completeness (' + str(av_perc_shifts) +'%)' +' is below recommended minimum (75%), RCI values may be unreliable* DONE')
+    av_perc_shifts_out = str(av_perc_shifts)+' (RCI may be unreliable!)'
+    print('*WARNING chemical shift completeness (' + str(av_perc_shifts) +'%)' +' is below recommended minimum (75%), RCI may be unreliable* DONE')
 else:
+    av_perc_shifts_out = str(av_perc_shifts)
     print('DONE')
 
 # write output file
@@ -351,7 +356,7 @@ RCI_FIRST_out.close()
 
 # append to scores.out
 scores = open('scores.out','a+')
-scores.write('PDB: '+ '{:<11}'.format(PDB_ID) + ' SHIFTS: '+ '{:<12}'.format(SHIFT_ID) + ' SHIFT%: '+ '{:<4}'.format(av_perc_shifts) + ' CorrelationScore: '+ '{:<5.1f}'.format(spearman_noRC) + ' RMSDScore: '+ '{:<5.1f}'.format(RMSD_noRC)+ '\n')
+scores.write('PDB: '+ '{:<11}'.format(PDB_ID) + ' SHIFTS: '+ '{:<11}'.format(SHIFT_ID) + ' SHIFT%: '+ '{:3}'.format(av_perc_shifts) + ' Spearman: '+ '{: 5.2f}'.format(spearman_noRC) + ' CorrelationScore: '+ '{:4.1f}'.format(corr_score) + ' RMSD: '+ '{:4.2f}'.format(RMSD_noRC) + ' RMSDScore: '+ '{:4.1f}'.format(RMSD_score)+ '\n')
 scores.close()
 
 # plot figs
