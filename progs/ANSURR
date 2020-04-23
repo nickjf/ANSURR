@@ -95,7 +95,7 @@ echo "$output_info"
 # log file
 log=../ANSURR.log
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n-------------------------- '$DATE' running ANSURR ---------------------------' | tee -a $log
+echo $'\n--------------------------------------- '$DATE' running ANSURR ---------------------------------------' | tee -a $log
 echo '' >> $log
 echo "$structure_info" >> $log
 echo "$shift_info" >> $log
