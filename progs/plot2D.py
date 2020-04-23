@@ -13,7 +13,7 @@ for line in open('scores.out','r'):
 		model = int(line[1].split('_')[-1])
 		shifts = line[3]
 		shift_perc = int(line[5])
-		if line[8] != 'nan':
+		if line[9] != 'nan':
 			if pdb not in data:
 				data[pdb] = {'model':[model],'rmsd':[float(line[13])],'corr':[float(line[9])],'shifts':shifts,'shift_perc':[shift_perc]}
 			else:
