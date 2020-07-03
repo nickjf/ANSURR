@@ -51,6 +51,7 @@ A directory called `<yourpdbfile>_<yourshiftfile>` is made to save the output ge
 * `DSSP/` - secondary structure for each model according to the program DSSP
 * `FIRST/` - flexibility predicted for each model using FIRST
 
+
 ## Overview of installation instructions
 
 1. You are asked whether you want to install ANSURR for all users:<br><br> 

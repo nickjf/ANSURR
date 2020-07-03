@@ -12,15 +12,17 @@ FIRST=$ANSURR_DIR/progs/calc_rigidity
 rigid_decomp=$ANSURR_DIR/progs/rigid_decomp.py
 split_decomp=$ANSURR_DIR/progs/split_decomp.py
 compare=$ANSURR_DIR/progs/compare.py
+compare_average=$ANSURR_DIR/progs/compare_average.py
 plot2D=$ANSURR_DIR/progs/plot2D.py
 
 ########## ARGS ##########
 run_PANAV=0
+average=0
 free_ligands=0
 nonstandard_res=0
 oligomer=0
 bonds=0
-while getopts ":p:s:bhlnor" opt; do
+while getopts ":p:s:abhlnor" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
@@ -56,6 +58,7 @@ while getopts ":p:s:bhlnor" opt; do
 			shift_info="shifts file: $OPTARG"
 	   fi
 	   echo "$shift_info";;
+	a)  average=1;;  
 	b)  bonds=1;;
 	l)  free_ligands=1;;
 	n)  nonstandard_res=1;;
@@ -330,6 +333,10 @@ if [ $count -gt 0 ]; then
 else
 	echo ' -> CRITICAL ERROR failed to calculate any validation scores, exiting' | tee -a $log
 	exit 1
+fi
+
+if (( $average == 1 )); then
+	$python_version $compare_average test_pdb test_shift other_output/DSSP/$pdb_num.dssp $ANSURR_DIR  ## need to deal with chains
 fi
 
 cd ../
