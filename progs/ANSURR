@@ -336,7 +336,10 @@ else
 fi
 
 if (( $average == 1 )); then
-	$python_version $compare_average test_pdb test_shift other_output/DSSP/$pdb_num.dssp $ANSURR_DIR  ## need to deal with chains
+	$python_version $compare_average $structure $shifts other_output/DSSP/$pdb_num.dssp $ANSURR_DIR  ## need to deal with chains
+	mv scores_average.out ANSURR_output/
+	mv $structure*'_'*$shifts*'_average.png' ANSURR_output/figs
+	mv $structure*'_'*$shifts*'_average.out' ANSURR_output/out
 fi
 
 cd ../
