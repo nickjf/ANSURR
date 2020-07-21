@@ -348,6 +348,7 @@ else:
     av_perc_shifts_out = str(av_perc_shifts)
     print('DONE')
 
+print(FIRST_noRC)
 # write output file
 RCI_FIRST_out = open(PDB_ID+'_'+SHIFT_ID+'.out','w')
 for i in enumerate(FIRST['resi']):
