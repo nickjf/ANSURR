@@ -86,14 +86,10 @@ for chain_shiftID in av:
         av_perc_shifts_out = str(av_perc_shifts)
         #print('DONE')
 
-
     RCI_nan = [i for i,x in enumerate(RCI) if np.isnan(x)]
     FIRST_nan = [i for i,x in enumerate(FIRST) if np.isnan(x)]
     RCI_noRC = [x for i,x in enumerate(RCI) if i not in FIRST_nan and not np.isnan(x) and shifts[i] >=0.17 ]
     FIRST_noRC = [x for i,x in enumerate(FIRST) if i not in RCI_nan and not np.isnan(x) and shifts[i] >=0.17]
-
-
-    print(FIRST_noRC)
 
     RMSD_noRC =  calc_RMSD(RCI_noRC,FIRST_noRC)
     RMSD_score = 100.0 - percentileofscore(rmsd_benchmark,RMSD_noRC)
