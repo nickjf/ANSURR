@@ -19,10 +19,11 @@ def compare_seq(seq1,seq2):
 def fix_missing_res(d,report_break):
     count = d['resi'][0]
     pos = 0
+    to_delete = []
     for i in d['resi']:
-        if i != count:
+        if i > count:
             if report_break == 1:
-                print('*WARNING break at resi '+str(count-1)+'* ', end='')
+                print('*WARNING break in PDB numbering at resi '+str(count-1)+'* ', end='')
                 report_break = 2
             for k in d:
                 if k == 'resi':
@@ -31,6 +32,11 @@ def fix_missing_res(d,report_break):
                     d[k].insert(pos,'XXX')
                 else:
                     d[k].insert(pos,np.nan)
+        elif i < count:
+            if report_break == 1:
+                print('*WARNING unexpected PDB numbering at resi '+str(count-1)+', renumbering* ', end='')
+                report_break = 2
+            d['resi'][pos] = count   
         elif report_break == 2:
             report_break = 1
         count += 1
