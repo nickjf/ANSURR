@@ -19,7 +19,6 @@ def plot(resi,RCI, FIRST,n):
     plt.ylabel('flexibility',size=12)
     plt.ylim(0,1.05)
     plt.title('structure: ' + PDB_ID+chain_shiftID.split('_')[0]+'_average' + ' shifts: ' + SHIFT_ID+'_'+chain_shiftID.split('_')[1] + ' shift%: '+av_perc_shifts_out+'\n correlation score: ' + str(round(corr_score,1)) +' RMSD score: ' + str(round(RMSD_score,1)))
-    #plt.title('structure: '  + ' shifts: ' + ' shift%: '+av_perc_shifts_out+'\n correlation score: ' + str(round(corr_score,1)) +' RMSD score: ' + str(round(RMSD_score,1)))
     plt.tight_layout()
     plt.savefig(PDB_ID+chain_shiftID.split('_')[0] +'_'+SHIFT_ID+chain_shiftID.split('_')[1]+'_average.png',dpi=300,bbox_inches='tight')
     
@@ -68,8 +67,14 @@ for i in o:
 n = 0
 for chain_shiftID in av:
     for r in av[chain_shiftID]:
-        av[chain_shiftID][r]['rci'] = np.nanmean(av[chain_shiftID][r]['rci'])
-        av[chain_shiftID][r]['first'] = np.nanmean(av[chain_shiftID][r]['first'])
+        if all_same([str(i) for i in av[chain_shiftID][r]['rci']]): #nanmean complains about lists with all nans
+            av[chain_shiftID][r]['rci'] = av[chain_shiftID][r]['rci'][0]
+        else:
+            av[chain_shiftID][r]['rci'] = np.nanmean(av[chain_shiftID][r]['rci'])
+        if all_same([str(i) for i in av[chain_shiftID][r]['first']]): #nanmean complains about lists with all nans
+            av[chain_shiftID][r]['first'] = av[chain_shiftID][r]['first'][0]
+        else:
+            av[chain_shiftID][r]['first'] = np.nanmean(av[chain_shiftID][r]['first'])
         av[chain_shiftID][r]['shift_perc'] = np.nanmean(av[chain_shiftID][r]['shift_perc'])
     
     av_perc_shifts = int(round(100.0*np.nanmean([av[chain_shiftID][i]['shift_perc'] for i in av[chain_shiftID]]),0))
