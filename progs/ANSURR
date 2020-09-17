@@ -279,7 +279,7 @@ if [ -f "$FIRST" ]; then
 			rm -f $structures/decomp_list
 		else
 			echo " ERROR FIRST did not run successfully" | tee -a $log
-			rm -f $structures/decomp_list
+			#rm -f $structures/decomp_list
 			rm -f $pdb_num'_FIRST.log'
 		fi
 	done
@@ -303,7 +303,7 @@ echo $'\n--------------------------------------- '$DATE' ANSURR output ---------
 
 if (( $oligomer == 1 )); then
 	for pdb in other_output/FIRST/$structure*.decomp; do
-		$python_version $split_decomp $pdb $structure
+		$python_version $split_decomp $pdb $structure 
 	done
 	rm other_output/FIRST/$structure*.decomp
 	cp -r *.decomp other_output/FIRST/
