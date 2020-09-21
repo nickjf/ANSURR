@@ -115,7 +115,7 @@ for chain_shiftID in av:
 
     # append to scores.out
     scores = open('scores_average.out','a+')
-    scores.write('PDB: '+ '{:<11}'.format(PDB_ID+chain_shiftID.split('_')[0]) + ' SHIFTS: '+ '{:<11}'.format(SHIFT_ID+'_'+chain_shiftID.split('_')[1]) + ' SHIFT%: '+ '{:3}'.format(av_perc_shifts) + ' Spearman: '+ '{: 5.2f}'.format(spearman_noRC) + ' CorrelationScore: '+ '{:4.1f}'.format(corr_score) + ' RMSD: '+ '{:4.2f}'.format(RMSD_noRC) + ' RMSDScore: '+ '{:4.1f}'.format(RMSD_score)+ '\n')
+    scores.write('PDB: '+ '{:<11}'.format(PDB_ID+chain_shiftID.split('_')[0]) + ' SHIFTS: '+ '{:<11}'.format(SHIFT_ID+'_'+chain_shiftID.split('_')[1]) + ' SHIFT%: '+ '{:3}'.format(av_perc_shifts) + ' Spearman: '+ '{: 5.3f}'.format(spearman_noRC) + ' CorrelationScore: '+ '{:4.1f}'.format(round(corr_score,1)) + ' RMSD: '+ '{:4.3f}'.format(RMSD_noRC) + ' RMSDScore: '+ '{:4.1f}'.format(round(RMSD_score,1))+ '\n')
     scores.close()
     plot(resi,RCI,FIRST,n)
     n+=1                                                                  
