@@ -296,10 +296,10 @@ if [ $count == 0 ]; then
 fi
 
 ########## COMPARE RCI FIRST ##########
-echo "calculating validation scores, output will be saved to to $structure"_"$shifts/ANSURR_output" | tee -a $log
+echo "calculating validation scores, output will be saved to $structure"_"$shifts/ANSURR_output" | tee -a $log
 mkdir ANSURR_output
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n--------------------------------------- '$DATE' ANSURR output ----------------------------------------'  > scores.out
+echo $'\n---------------------------------------- '$DATE' ANSURR output -----------------------------------------'  > scores.out
 
 if (( $oligomer == 1 )); then
 	for pdb in other_output/FIRST/$structure*.decomp; do
