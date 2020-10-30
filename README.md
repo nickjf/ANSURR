@@ -2,7 +2,7 @@
 # ANSURR | Accuracy of NMR Structures Using RCI and Rigidity 
 [![DOI](https://zenodo.org/badge/234519929.svg)](https://zenodo.org/badge/latestdoi/234519929)
 
-ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as will be described in our paper (under review). This repository contains the code required to install and run ANSURR on a Linux (and possibly Mac) machine. This version is still under development but should work fine in most cases. Please let me know if you have any issues. 
+ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as will be described in our paper (Nat Commun, in press). This repository contains the code required to install and run ANSURR on a Linux (and possibly Mac) machine. Please let me know if you have any issues. 
 
 ## Installation
 
