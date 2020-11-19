@@ -4,6 +4,7 @@ import sys, os
 import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
 from scipy.stats import percentileofscore
+import json
 
 def plot(resi,RCI, FIRST,n):
     #helices_x = [FIRST['resi'][i[0]] for i in enumerate(FIRST['ss']) if i[1] == 'H'] # FIRST resi can be nan!
@@ -36,16 +37,19 @@ def all_same(items):
 PDB_ID = os.path.basename(sys.argv[1]).split('.')[0]
 SHIFT_ID= os.path.basename(sys.argv[2]).split('.')[0]
 ANSURR_PATH = sys.argv[4]
-rmsd_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_rmsd','r')
-corr_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_corr','r')
+#rmsd_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_rmsd','r')
+#corr_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_corr','r')
 
-corr_benchmark = []
-for line in corr_benchmark_in:
-    corr_benchmark.append(float(line))
+#corr_benchmark = []
+#for line in corr_benchmark_in:
+#    corr_benchmark.append(float(line))
     
-rmsd_benchmark = []
-for line in rmsd_benchmark_in:
-    rmsd_benchmark.append(float(line))
+#rmsd_benchmark = []
+#for line in rmsd_benchmark_in:
+#    rmsd_benchmark.append(float(line))
+
+with open(ANSURR_PATH+'/lib/benchmarks.txt') as json_file:
+    benchmarks = json.load(json_file)
 
 o = glob.glob('ANSURR_output/out/*.out')
 
@@ -97,7 +101,7 @@ for chain_shiftID in av:
     FIRST_noRC = [x for i,x in enumerate(FIRST) if i not in RCI_nan and not np.isnan(x) and shifts[i] >=0.17]
 
     RMSD_noRC =  calc_RMSD(RCI_noRC,FIRST_noRC)
-    RMSD_score = 100.0 - percentileofscore(rmsd_benchmark,RMSD_noRC)
+    RMSD_score = 100.0 - percentileofscore(benchmarks['rmsd'],RMSD_noRC)
 
     if all_same(FIRST_noRC) or all_same(RCI_noRC):
         spearman_noRC = np.nan
@@ -105,7 +109,7 @@ for chain_shiftID in av:
         #print('*WARNING Spearman correlation coefficient cannot be determined, setting correlation score to NaN * ',end='')
     else:
         spearman_noRC = spearmanr(RCI_noRC,FIRST_noRC)[0]
-        corr_score = percentileofscore(corr_benchmark,spearman_noRC)
+        corr_score = percentileofscore(benchmarks['corr'],spearman_noRC)
 
     # write output file
     RCI_FIRST_out = open(PDB_ID+chain_shiftID.split('_')[0] +'_'+SHIFT_ID+chain_shiftID.split('_')[1]+'_average.out','w')

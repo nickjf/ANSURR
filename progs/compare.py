@@ -6,6 +6,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
 from scipy.stats import percentileofscore
+import json
 
 def compare_seq(seq1,seq2):
     score = 0
@@ -258,8 +259,12 @@ RCI_in = open(sys.argv[2],'r')
 PDB_ID = os.path.basename(sys.argv[1]).split('.')[0]
 SHIFT_ID= os.path.basename(sys.argv[2]).split('.')[0]
 ANSURR_PATH = sys.argv[4]
-rmsd_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_rmsd','r')
-corr_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_corr','r')
+
+with open(ANSURR_PATH+'/lib/benchmarks.txt') as json_file:
+    benchmarks = json.load(json_file)
+
+#rmsd_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_rmsd','r')
+#corr_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_corr','r')
 print(" -> "+PDB_ID + '|'+ SHIFT_ID+' ',end='')
 
 # secondary structure
@@ -302,13 +307,13 @@ for line in FIRST_in:
     except:
         FIRST['ss'].append(np.nan)
 
-corr_benchmark = []
-for line in corr_benchmark_in:
-    corr_benchmark.append(float(line))
+#corr_benchmark = []
+#for line in corr_benchmark_in:
+#    corr_benchmark.append(float(line))
     
-rmsd_benchmark = []
-for line in rmsd_benchmark_in:
-    rmsd_benchmark.append(float(line))
+#rmsd_benchmark = []
+#for line in rmsd_benchmark_in:
+#    rmsd_benchmark.append(float(line))
     
 # fix missing residues
 FIRST = fix_missing_res(FIRST,1)
@@ -335,7 +340,7 @@ RCI_noRC = [x for i,x in enumerate(RCI['score']) if i not in FIRST_nan and not n
 FIRST_noRC = [x for i,x in enumerate(FIRST['score']) if i not in RCI_nan and not np.isnan(x) and RCI['shift_types'][i] != 'RC']
 
 RMSD_noRC =  calc_RMSD(RCI_noRC,FIRST_noRC)
-RMSD_score = 100.0 - percentileofscore(rmsd_benchmark,RMSD_noRC)
+RMSD_score = 100.0 - percentileofscore(benchmarks['rmsd'],RMSD_noRC)
 
 if all_same(FIRST_noRC) or all_same(RCI_noRC):
     spearman_noRC = np.nan
@@ -343,7 +348,7 @@ if all_same(FIRST_noRC) or all_same(RCI_noRC):
     print('*WARNING Spearman correlation coefficient cannot be determined, setting correlation score to NaN * ',end='')
 else:
     spearman_noRC = spearmanr(RCI_noRC,FIRST_noRC)[0]
-    corr_score = percentileofscore(corr_benchmark,spearman_noRC)
+    corr_score = percentileofscore(benchmarks['corr'],spearman_noRC)
 
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
