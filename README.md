@@ -2,7 +2,7 @@
 # ANSURR | Accuracy of NMR Structures Using RCI and Rigidity 
 [![DOI](https://zenodo.org/badge/234519929.svg)](https://zenodo.org/badge/latestdoi/234519929)
 
-ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as will be described in our paper (Nat Commun, in press). This repository contains the code required to install and run ANSURR on a Linux (and possibly Mac) machine. Please let me know if you have any issues. 
+ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as described here https://www.nature.com/articles/s41467-020-20177-1. This repository contains the code required to install and run ANSURR on a Linux (and possibly Mac) machine. Please let me know if you have any issues. 
 
 ## Installation
 
@@ -78,6 +78,12 @@ If module installation fails then you will need to find another way to install t
 `Java not found, you could try to install Java by running: sudo apt install default-jre`<br>
 &nbsp;` -> would you like to try this now? (y/n)`<br><br>
 Java is only required to run PANAV, so ANSURR will run fine without it - but make sure your chemical shifts are referenced correctly or re-reference them using some other software.
+
+
+## Help
+
+Contact Nick Fowler (njfowler.com) for support, queries or suggestions.
+
 
 ## Acknowledgements
 
