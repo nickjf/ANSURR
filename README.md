@@ -84,6 +84,10 @@ Java is only required to run PANAV, so ANSURR will run fine without it - but mak
 
 Contact Nick Fowler (njfowler.com) for support, queries or suggestions.
 
+## Known Issues
+
+- PANAV (a program for re-referencing chemical shifts) has some kind of GUI interface built in to the code and will not run if it can't find a display. This means it won't work when runing ANSURR on a remote machine without X forwarding.  
+
 
 ## Acknowledgements
 
