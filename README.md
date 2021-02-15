@@ -88,6 +88,8 @@ Contact Nick Fowler (njfowler.com) for support, queries or suggestions.
 
 - PANAV (a program for re-referencing chemical shifts) has some kind of GUI interface built in to the code and will not run if it can't find a display. This means it won't work when running ANSURR on a remote machine without X forwarding.  
 
+- calc_rigidity might not run for RatHat Enterprise Linux 6 (RHEL6) and earlier because it needs gcc4.8.4. RHEL6 comes with gcc4.4.x. So ANSURR will not run correctly. 
+
 
 ## Acknowledgements
 
