@@ -114,29 +114,57 @@ fi
 
 # install
 #sed -i '/local_install=/d' ANSURR
-sed -i '/ANSURR_DIR=/d' ANSURR
-sed -i '/python_version=/d' ANSURR
+if [ $machine == "Mac" ]; then
+	sed -i '' '/ANSURR_DIR=/d' ANSURR
+	sed -i '' '/python_version=/d' ANSURR
+else
+	sed -i '/ANSURR_DIR=/d' ANSURR
+	sed -i '/python_version=/d' ANSURR
+fi
 
 if [ $local_install == "1" ]; then
     ANSURR_DIR=$(pwd)
-	sed "1 a\python_version=$python_version\nANSURR_DIR=$ANSURR_DIR" ANSURR > ANSURR_tmp
+    if [ $machine == "Mac" ]; then
+		sed "1a\\
+                python_version=$python_version\\
+                " ANSURR > ANSURR_tmp1
+                sed "2a\\
+                ANSURR_DIR=$ANSURR_DIR\\
+                " ANSURR_tmp1 > ANSURR_tmp
+                rm ANSURR_tmp1
+	else
+		sed "1 a\python_version=$python_version\nANSURR_DIR=$ANSURR_DIR" ANSURR > ANSURR_tmp
+	fi
 	chmod +x ANSURR_tmp
-	mv ANSURR_tmp ansurr
+	mv ANSURR_tmp ansurr_local
 	rm ANSURR
-	if [ -z $(command -v ./ansurr) ]; then
+	if [ -z $(command -v ./ansurr_local) ]; then
 		echo "ANSURR failed to install" 
 		echo
 	else
 		echo "ANSURR installed successfully"
 		echo 
-		./ansurr -h
+		./ansurr_local -h
 		echo
 	fi
 else
     ANSURR_DIR='/usr/local/lib/ansurr'
-	sed "1 a\python_version=$python_version\nANSURR_DIR=$ANSURR_DIR" ANSURR > ANSURR_tmp
+    if [ $machine == "Mac" ]; then
+		sed "1a\\
+		python_version=$python_version\\
+		" ANSURR > ANSURR_tmp1
+		sed "2a\\
+                ANSURR_DIR=$ANSURR_DIR\\
+                " ANSURR_tmp1 > ANSURR_tmp
+		rm ANSURR_tmp1
+	else
+		sed "1 a\python_version=$python_version\nANSURR_DIR=$ANSURR_DIR" ANSURR > ANSURR_tmp
+	fi
 	chmod +x ANSURR_tmp
 	sudo mkdir -p /usr/local/lib/ansurr
+	if [ ! -d /usr/local/bin ]; then
+        	sudo mkdir -p /usr/local/bin
+	fi
 	sudo cp -r progs /usr/local/lib/ansurr/
 	sudo cp -r lib /usr/local/lib/ansurr/
 	sudo mv ANSURR_tmp /usr/local/bin/ansurr

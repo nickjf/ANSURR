@@ -1,4 +1,4 @@
-import sys,pathlib,json
+import sys,os,json
 
 def make_monomers(pdbid,chains,model):
 	pdb = 'combined/'+pdbid+chains+'_'+model+'.pdb'
@@ -141,7 +141,8 @@ for model in models:
 	chains = ''
 	if oligomers == 1:
 		if len(models[model]) > 1:
-			pathlib.Path("combined").mkdir(parents=True, exist_ok=True)
+			if not os.path.exists('combined'):
+				os.makedirs('combined')
 			for chain in models[model]:
 				chains += chain
 			out = open('combined/'+pdb+chains+'_'+model+'.pdb','w')
