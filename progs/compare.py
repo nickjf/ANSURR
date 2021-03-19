@@ -63,13 +63,9 @@ def align(RCI,FIRST,cut_off=0.5):
     if len(RCI['resn']) <= len(FIRST['resn']): # "a" is always the shorter seq
         a = RCI['resn']
         b = FIRST['resn']
-        a_score = RCI['score']
-        b_score = FIRST['score'] 
     else:
         a = FIRST['resn']
         b = RCI['resn']
-        a_score = FIRST['score']
-        b_score = RCI['score']
 
     max_score_N = 0
     for i in range(len(b)): # start from N
@@ -81,11 +77,6 @@ def align(RCI,FIRST,cut_off=0.5):
         score = calc_score(a_test,b)
         if score > max_score_N:
             max_score_N = score
-            a_score_test = a_score[-i-1:len(b_score)+1]
-            a_score_test.extend([np.nan]*(len(b_score)-i-1))
-            a_score_test = a_score_test[::-1]
-            a_score_test.extend([np.nan]*(len(b_score)-len(a_score_test)))
-            a_score_test = a_score_test[::-1]
             chosen_i = i
 
     max_score_C = max_score_N # then start from C and look for better fit
@@ -97,26 +88,22 @@ def align(RCI,FIRST,cut_off=0.5):
         score = calc_score(a_test,b)
         if score > max_score_C:
             max_score_C = score
-            a_score_test = a_score[:-i]
-            a_score_test = a_score_test[::-1]
-            a_score_test.extend([np.nan]*(len(b_score)-len(a_score_test)))
-            a_score_test = a_score_test[::-1]
             chosen_i = i
 
     if max_score_N >= max_score_C:
         if len(RCI['resi']) <= len(FIRST['resi']):
             for r in RCI:  
-                RCI[r] = RCI[r][-chosen_i-1:len(b_score)+1] 
-                RCI[r].extend([np.nan]*(len(b_score)-chosen_i-1))
+                RCI[r] = RCI[r][-chosen_i-1:len(b)+1] 
+                RCI[r].extend([np.nan]*(len(b)-chosen_i-1))
                 RCI[r] = RCI[r][::-1]   
-                RCI[r].extend([np.nan]*(len(b_score)-len(RCI[r])))
+                RCI[r].extend([np.nan]*(len(b)-len(RCI[r])))
                 RCI[r] = RCI[r][::-1]
         else:
             for f in FIRST:
-                FIRST[f] = FIRST[f][-chosen_i-1:len(b_score)+1] 
-                FIRST[f].extend([np.nan]*(len(b_score)-chosen_i-1)) 
+                FIRST[f] = FIRST[f][-chosen_i-1:len(b)+1] 
+                FIRST[f].extend([np.nan]*(len(b)-chosen_i-1)) 
                 FIRST[f] = FIRST[f][::-1]   
-                FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
+                FIRST[f].extend([np.nan]*(len(b)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         num_resn = len([i for i in FIRST['resn'] if i != 'XXX'])
         if max_score_N < cut_off * num_resn:
@@ -127,13 +114,13 @@ def align(RCI,FIRST,cut_off=0.5):
             for r in RCI:
                 RCI[r] = RCI[r][:-chosen_i]
                 RCI[r] = RCI[r][::-1]
-                RCI[r].extend([np.nan]*(len(b_score)-len(RCI[r])))
+                RCI[r].extend([np.nan]*(len(b)-len(RCI[r])))
                 RCI[r] = RCI[r][::-1]
         else:
             for f in FIRST:
                 FIRST[f] = FIRST[f][:-chosen_i]
                 FIRST[f] = FIRST[f][::-1]
-                FIRST[f].extend([np.nan]*(len(b_score)-len(FIRST[f])))
+                FIRST[f].extend([np.nan]*(len(b)-len(FIRST[f])))
                 FIRST[f] = FIRST[f][::-1]
         num_resn = len([i for i in FIRST['resn'] if i != 'XXX'])
         if max_score_C < cut_off * num_resn:
@@ -142,7 +129,7 @@ def align(RCI,FIRST,cut_off=0.5):
     RCI['resi'] = FIRST['resi']
     return RCI, FIRST
 
-def trim(res1,res2): # lazt variable names fix this!
+def trim(res1,res2): # lazy variable names fix this!
     s = 0
     e = 0
     sc = 0
@@ -263,8 +250,6 @@ ANSURR_PATH = sys.argv[4]
 with open(ANSURR_PATH+'/lib/benchmarks.txt') as json_file:
     benchmarks = json.load(json_file)
 
-#rmsd_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_rmsd','r')
-#corr_benchmark_in = open(ANSURR_PATH+'/lib/benchmark_corr','r')
 print(" -> "+PDB_ID + '|'+ SHIFT_ID+' ',end='')
 
 # secondary structure
@@ -306,14 +291,6 @@ for line in FIRST_in:
         FIRST['ss'].append(ss_dict[int(line[0])])
     except:
         FIRST['ss'].append(np.nan)
-
-#corr_benchmark = []
-#for line in corr_benchmark_in:
-#    corr_benchmark.append(float(line))
-    
-#rmsd_benchmark = []
-#for line in rmsd_benchmark_in:
-#    rmsd_benchmark.append(float(line))
     
 # fix missing residues
 FIRST = fix_missing_res(FIRST,1)
