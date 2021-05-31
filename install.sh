@@ -8,6 +8,11 @@ case $uname_out in
 	*)		machine=$uname_out;echo "unknown machine type: $uname_out, this installer probably won't work...";
 esac
 
+if [ $machine == "Mac" ]; then
+	echo "Sorry, ANSURR is not currently available for MAC, but will be in a future release!"
+	exit 0
+fi
+
 cp progs/ANSURR .
 
 # install for all users?
