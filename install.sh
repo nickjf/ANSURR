@@ -141,15 +141,15 @@ if [ $local_install == "1" ]; then
 		sed "1 a\python_version=$python_version\nANSURR_DIR=$ANSURR_DIR" ANSURR > ANSURR_tmp
 	fi
 	chmod +x ANSURR_tmp
-	mv ANSURR_tmp ansurr_local
+	mv ANSURR_tmp ansurr
 	rm ANSURR
-	if [ -z $(command -v ./ansurr_local) ]; then
+	if [ -z $(command -v ./ansurr) ]; then
 		echo "ANSURR failed to install" 
 		echo
 	else
 		echo "ANSURR installed successfully"
 		echo 
-		./ansurr_local -h
+		./ansurr -h
 		echo
 	fi
 else
