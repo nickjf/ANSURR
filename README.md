@@ -1,5 +1,5 @@
 
-# ANSURR | Accuracy of NMR Structures Using RCI and Rigidity 
+# ANSURR | Accuracy of NMR Structures Using RCI and Rigidity v1.1.0
 [![DOI](https://zenodo.org/badge/234519929.svg)](https://zenodo.org/badge/latestdoi/234519929)
 
 ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as described here https://www.nature.com/articles/s41467-020-20177-1. This repository contains the code required to install and run ANSURR on a Linux machine. ANSURR is not yet available for Mac or Windows machines. Please let me know if you have any issues. 
@@ -102,6 +102,8 @@ Probabilistic Approach to NMR Assignment and Validation (PANAV) | Bowei Wang, Yu
 DSSP | A series of PDB related databases for everyday needs. Wouter G Touw, Coos Baakman, Jon Black, Tim AH te Beek, E Krieger, Robbie P Joosten, Gert Vriend. Nucleic Acids Research 2015 January; 43(Database issue): D364-D368. | Dictionary of protein secondary structure: pattern recognition of hydrogen-bonded and geometrical features. Kabsch W, Sander C, Biopolymers. 1983 22 2577-2637.
 
 adjustText - automatic label placement for matplotlib | https://github.com/Phlya/adjustText
+
+CYRANGE | D.K. Kirchner &amp; P. Güntert, BMC Bioinformatics 2011, 12 170.
 
 
 

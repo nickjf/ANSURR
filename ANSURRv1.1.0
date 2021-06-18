@@ -1,0 +1,18 @@
+ANSURR v1.1.0
+
+Major changes 
+
+Added the option to identify well-defined residues using CYRANGE and compute ANSURR scores over these regions (using it's own benchmark for well-defined residues only). Well and ill defined regions are indicated on flexibility plots. 
+
+
+Minor chnages
+
+Updated correlation and RMSD benchmark values to reflect PDB structures available up to June 2021
+
+Secondary structure and whether residues are well-defined or not are inlcuded in output text files
+
+You can now type paths to shifts and structure as input
+
+Resdiues with no chemical shift data (not used to determine ANSURR scores) are highlighted on flexibility plots as black crosses
+
+Various loops now loop over structures in alphanumeric order (it looks nicer) 

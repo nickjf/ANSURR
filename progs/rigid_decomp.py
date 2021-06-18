@@ -22,7 +22,7 @@ for line in pdb:
         atom_name = line[12:16]
         resn = line[17:20].replace(' ','')
         resi = int(line[22:26])
-        if atom_name == ' CA ':
+        if atom_name == ' CA ': # this is occasionally a problem for ligands which have a CA atom, however, it's difficult to spot a ligand CA atom from a non-std residue CA atom, and doesn't effect scoring etc. Leave for now
             r = res(resi,resn,atom_number)
 
 # import decomp_list         

@@ -14,28 +14,30 @@ split_decomp=$ANSURR_DIR/progs/split_decomp.py
 compare=$ANSURR_DIR/progs/compare.py
 compare_average=$ANSURR_DIR/progs/compare_average.py
 plot2D=$ANSURR_DIR/progs/plot2D.py
-cyrange=$ANSURR_DIR/progs/cyrange
+CYRANGE=$ANSURR_DIR/progs/cyrange
+extract_cyrange=$ANSURR_DIR/progs/extract_cyrange.py
 
 ########## ARGS ##########
 run_PANAV=0
-run_cyrange=0
+run_CYRANGE=0
 average=0
 free_ligands=0
 nonstandard_res=0
 oligomer=0
 bonds=0
-while getopts ":p:s:abhlnor" opt; do
+while getopts ":p:s:abhlnorw" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
 	   echo "Options:"
-	   echo " -b | read in extra covalent bonds from CONECT recoords in the structure file"
-	   echo " -c | compute ANSURR scores over the residue range identified by CYRANGE"
+	   echo " -b | read in extra covalent bonds from CONECT records in the structure file"
+	   #echo " -i | set mininum sequence identity required between sequences in shift and structure files (default 50%)"
 	   echo " -h | print this help message"
 	   echo " -l | include free ligands when calculating flexibility"
 	   echo " -n | include non-standard residues when calculating flexibility"
 	   echo " -o | combine chains when calculating flexibility (e.g. for dimers)"
 	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
+	   echo " -w | compute ANSURR scores for the well-defined residues identified by CYRANGE"
 	   exit 1;;
     p) if [ ! -f "$OPTARG" ]; then
        		echo "$OPTARG does not exist, exiting"
@@ -65,11 +67,11 @@ while getopts ":p:s:abhlnor" opt; do
 	   echo "$shift_info";;
 	a)  average=1;;  
 	b)  bonds=1;;
-	c)  run_cyrange=1;;
 	l)  free_ligands=1;;
 	n)  nonstandard_res=1;;
 	o)  oligomer=1;;
 	r)  run_PANAV=1;;
+	w)  run_CYRANGE=1;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
     :)  echo "Option -$OPTARG requires an argument." >&2
@@ -104,7 +106,7 @@ echo "$output_info"
 # log file
 log=../ANSURR.log
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n--------------------------------------- '$DATE' running ANSURR ---------------------------------------' | tee -a $log
+echo $'\n----------------------------------------------------------------------------- '$DATE' running ANSURR -----------------------------------------------------------------------------' | tee -a $log
 echo '' >> $log
 echo "$structure_info" >> $log
 echo "$shift_info" >> $log
@@ -263,6 +265,27 @@ else
 	echo " -> ERROR DSSP didn't predict secondary structure for any models"  | tee -a $log
 fi
 
+########## CALC CYRANGE ##########
+if [ $run_CYRANGE == 1 ]; then
+	if [ -f "$CYRANGE" ]; then
+		echo "identifying well-defined residues using CYRANGE" | tee -a $log
+		mkdir -p other_output/CYRANGE
+		{ LIBC_FATAL_STDERR_=1 $CYRANGE $structure'.pdb' > $structure'.cyrange' 2>/dev/null; } &>/dev/null
+		$python_version $extract_cyrange $structure'.cyrange' | tee -a $log
+		mv $structure'.cyrange' other_output/CYRANGE/
+	else 
+	    echo " -> ERROR could not find $CYRANGE, will proceed without identifying well-defined residues" | tee -a $log
+	fi
+	# check extract CYRANGE success
+	if [ -f "cyrange.json" ]; then
+		mv 'cyrange.json' other_output/CYRANGE/
+	else
+		run_CYRANGE=0
+		echo " -> ERROR CYRANGE failed, will proceed without identifying well-defined residues" | tee -a $log
+	fi
+fi
+
+
 ########## FIRST ##########
 if [ -f "$FIRST" ]; then
 	echo "calculating flexibility of each model using FIRST" | tee -a $log
@@ -271,7 +294,7 @@ if [ -f "$FIRST" ]; then
 	else
 		structures=other_output/extracted_pdbs
 	fi
-	for pdb in $structures/$structure*.pdb; do 
+	for pdb in `ls $structures/$structure*.pdb | sort -V` ; do 
 		F=$(basename $pdb)
 		pdb_num="${F%.*}"
 		echo -n " -> $pdb_num" | tee -a $log
@@ -302,12 +325,11 @@ if [ $count == 0 ]; then
 fi
 
 
-
 ########## COMPARE RCI FIRST ##########
 echo "calculating validation scores, output will be saved to $structure"_"$shifts/ANSURR_output" | tee -a $log
 mkdir ANSURR_output
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n---------------------------------------- '$DATE' ANSURR output -----------------------------------------'  > scores.out
+echo $'\n------------------------------------------------------------------------------ '$DATE' ANSURR output -------------------------------------------------------------------------------'  > scores.out
 
 if (( $oligomer == 1 )); then
 	for pdb in other_output/FIRST/$structure*.decomp; do
@@ -318,18 +340,18 @@ if (( $oligomer == 1 )); then
 	rm *.decomp
 fi
 		
-for pdb in other_output/FIRST/$structure*.decomp; do
+for pdb in `ls other_output/FIRST/$structure*.decomp | sort -V` ; do
 	F=$(basename $pdb)
 	pdb_num="${F%.*}"
 	for s in other_output/RCI/$shifts*.rci; do 
-		$python_version $compare $pdb $s other_output/DSSP/$pdb_num.dssp $ANSURR_DIR | tee -a $log
+		$python_version $compare $pdb $s other_output/DSSP/$pdb_num.dssp $ANSURR_DIR $run_CYRANGE | tee -a $log
 	done
 done
 rm -f resi_ref.tmp
 # check compare success
 count=$(ls -l $structure*'_'*$shifts*'.out' 2>/dev/null | wc -l)
 if [ $count -gt 0 ]; then
-	$python_version $plot2D scores.out
+	$python_version $plot2D scores.out $run_CYRANGE
 	mkdir -p ANSURR_output/figs
 	mkdir -p ANSURR_output/out
 	mv scores.out ANSURR_output/
@@ -344,7 +366,7 @@ else
 fi
 
 if (( $average == 1 )); then
-	$python_version $compare_average $structure $shifts other_output/DSSP/$pdb_num.dssp $ANSURR_DIR  ## need to deal with chains
+	$python_version $compare_average $structure $shifts other_output/DSSP/$pdb_num.dssp $ANSURR_DIR  ## need to deal with multiple xchains
 	mv scores_average.out ANSURR_output/
 	mv $structure*'_'*$shifts*'_average.png' ANSURR_output/figs
 	mv $structure*'_'*$shifts*'_average.out' ANSURR_output/out

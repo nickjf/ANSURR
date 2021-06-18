@@ -223,18 +223,41 @@ def rescale_RCI(RCI_score):
 
 def plot(RCI, FIRST):
     helices_x = [FIRST['resi'][i[0]] for i in enumerate(FIRST['ss']) if i[1] == 'H'] # FIRST resi can be nan!
-    helices_y = [1.025]*len(helices_x)
+    helices_y = [1.04]*len(helices_x)
     strands_x = [FIRST['resi'][i[0]] for i in enumerate(FIRST['ss']) if i[1] == 'E']
-    strands_y = [1.025]*len(strands_x)
+    strands_y = [1.04]*len(strands_x)
+
+    RC_residues_x = [FIRST['resi'][i[0]] for i in enumerate(FIRST['resi']) if RCI['shift_types'][i[0]] == 'RC']
+    if len(RC_residues_x) > 0:
+        RC_residues_y = [1.02]*len(RC_residues_x)
+        plt.scatter(RC_residues_x,RC_residues_y,color='black',marker="x",s=5)
+
+    if run_CYRANGE == '1':
+        welldefined_x = [FIRST['resi'][i[0]] for i in enumerate(FIRST['welldefined']) if i[1] == '1'] # FIRST resi can be nan!
+        welldefined_y = [1.06]*len(welldefined_x)
+        illdefined_x = [FIRST['resi'][i[0]] for i in enumerate(FIRST['welldefined']) if i[1] == '0'] # FIRST resi can be nan!
+        illdefined_y = [1.06]*len(illdefined_x)
+        plt.scatter(welldefined_x,welldefined_y,color='limegreen',s=2)
+        plt.scatter(illdefined_x,illdefined_y,color='grey',s=2)
+
+    # get range over which to plot
+    resi_range = []
+    for i in enumerate(FIRST['resi']):
+        if str(FIRST['score'][i[0]]) != 'nan' and str(RCI['score'][i[0]]) != 'nan':
+            resi_range.append(i[1])
 
     plt.plot(RCI['resi'],RCI['score'])
     plt.plot(FIRST['resi'],FIRST['score'])
     plt.scatter(helices_x,helices_y,color='red',s=2)
     plt.scatter(strands_x,strands_y,color='blue',s=2)
-    plt.xlabel('residue number',size=12)
-    plt.ylabel('flexibility',size=12)
-    plt.ylim(0,1.05)
-    plt.title('structure: ' + PDB_ID + ' shifts: ' + SHIFT_ID + ' shift%: '+av_perc_shifts_out+'\n correlation score: ' + str(round(corr_score,1)) +' RMSD score: ' + str(round(RMSD_score,1)))
+    plt.xlabel('residue number',size=10)
+    plt.ylabel('flexibility',size=10)
+    plt.ylim(0,1.075)
+    plt.xlim(min(resi_range)-5,max(resi_range)+5)
+    if run_CYRANGE == '1':
+        plt.title('structure: ' + PDB_ID + ' shifts: ' + SHIFT_ID + ' shift%: '+av_perc_shifts_out+'\n All residues | Corr: '+"{:.3f}".format(spearman_noRC)+' CorrScore: ' + "{:.1f}".format(corr_score)+' RMSD: '+"{:.3f}".format(RMSD_noRC)+' RMSDScore: ' + "{:.1f}".format(RMSD_score)+'\n Well-defined | Corr: '+"{:.3f}".format(spearman_noRC_welldefined)+' CorrScore: ' + "{:.1f}".format(corr_score_welldefined)+' RMSD: '+"{:.3f}".format(RMSD_noRC_welldefined)+' RMSDScore: ' + "{:.1f}".format(RMSD_score_welldefined),fontsize=10)
+    else:
+        plt.title('structure: ' + PDB_ID + ' shifts: ' + SHIFT_ID + ' shift%: '+av_perc_shifts_out+'\n Corr: '+"{:.3f}".format(spearman_noRC)+' CorrScore: ' + "{:.1f}".format(corr_score)+' RMSD: '+"{:.3f}".format(RMSD_noRC)+' RMSDScore: ' + "{:.1f}".format(RMSD_score),fontsize=10)
     plt.savefig(PDB_ID+'_'+SHIFT_ID+'.png',dpi=300,bbox_inches='tight')
 
 def all_same(items):
@@ -246,8 +269,18 @@ RCI_in = open(sys.argv[2],'r')
 PDB_ID = os.path.basename(sys.argv[1]).split('.')[0]
 SHIFT_ID= os.path.basename(sys.argv[2]).split('.')[0]
 ANSURR_PATH = sys.argv[4]
+run_CYRANGE = sys.argv[5]
 
-with open(ANSURR_PATH+'/lib/benchmarks.txt') as json_file:
+CHAIN_ID='' # clunky but allows for '_' in PDB name, need to check if this is an issue anywhere else
+for i in PDB_ID.split('_')[:-1]:
+    CHAIN_ID+=i+'_'
+CHAIN_ID = CHAIN_ID[-2]
+
+if run_CYRANGE == '1':
+    with open(os.getcwd()+'/other_output/CYRANGE/cyrange.json') as json_file:
+        cyrange = json.load(json_file)
+
+with open(ANSURR_PATH+'/lib/benchmarks.json') as json_file:
     benchmarks = json.load(json_file)
 
 print(" -> "+PDB_ID + '|'+ SHIFT_ID+' ',end='')
@@ -256,7 +289,6 @@ print(" -> "+PDB_ID + '|'+ SHIFT_ID+' ',end='')
 ss_dict = {}
 try:
     secondary_structure_in = open(sys.argv[3],'r')
-
     for line in secondary_structure_in:
         line = line.split()
         try:
@@ -291,6 +323,21 @@ for line in FIRST_in:
         FIRST['ss'].append(ss_dict[int(line[0])])
     except:
         FIRST['ss'].append(np.nan)
+
+if run_CYRANGE == '1':
+    FIRST['welldefined'] = []
+    if len(cyrange) == 1:
+        chain = 'default chain'
+    else:
+        chain = CHAIN_ID
+
+    for resi in FIRST['resi']:
+        if resi in cyrange[chain]:
+            FIRST['welldefined'].append('1')
+        else:
+            FIRST['welldefined'].append('0')
+else:
+    FIRST['welldefined'] = ['0']*len(FIRST['resi'])
     
 # fix missing residues
 FIRST = fix_missing_res(FIRST,1)
@@ -327,10 +374,28 @@ else:
     spearman_noRC = spearmanr(RCI_noRC,FIRST_noRC)[0]
     corr_score = percentileofscore(benchmarks['corr'],spearman_noRC)
 
+if run_CYRANGE == '1':
+    RCI_noRC_welldefined = [x for i,x in enumerate(RCI['score']) if i not in FIRST_nan and not np.isnan(x) and RCI['shift_types'][i] != 'RC' and FIRST['welldefined'][i]=='1']
+    FIRST_noRC_welldefined = [x for i,x in enumerate(FIRST['score']) if i not in RCI_nan and not np.isnan(x) and RCI['shift_types'][i] != 'RC' and FIRST['welldefined'][i]=='1']
+    
+    RMSD_noRC_welldefined =  calc_RMSD(RCI_noRC_welldefined,FIRST_noRC_welldefined)
+    RMSD_score_welldefined = 100.0 - percentileofscore(benchmarks['rmsd_welldefined'],RMSD_noRC_welldefined)
+    #RMSD_score_welldefined = 100.0 - percentileofscore(benchmarks['rmsd_welldefined'],RMSD_noRC_welldefined)
+
+    if all_same(FIRST_noRC_welldefined) or all_same(RCI_noRC_welldefined):
+        spearman_noRC_welldefined = np.nan
+        corr_score_welldefined = np.nan
+        print('*WARNING Spearman correlation coefficient for well-defined residues cannot be determined, setting correlation score to NaN * ',end='')
+    else:
+        spearman_noRC_welldefined = spearmanr(RCI_noRC_welldefined,FIRST_noRC_welldefined)[0]
+        corr_score_welldefined = percentileofscore(benchmarks['corr_welldefined'],spearman_noRC_welldefined)
+        #corr_score_welldefined = percentileofscore(benchmarks['corr_welldefined'],spearman_noRC_welldefined)
+
+
 av_perc_shifts = int(round(np.nanmean([RCI['shifts'][i[0]] for i in enumerate(RCI['resi']) if not np.isnan(i[1])])*100.0))
 
 if av_perc_shifts < 75:
-    av_perc_shifts_out = str(av_perc_shifts)+' (RCI may be unreliable!)'
+    av_perc_shifts_out = str(av_perc_shifts)+' (RCI less reliable!)'
     print('*WARNING chemical shift completeness (' + str(av_perc_shifts) +'%)' +' is below recommended minimum (75%), RCI may be unreliable* DONE')
 else:
     av_perc_shifts_out = str(av_perc_shifts)
@@ -339,12 +404,24 @@ else:
 # write output file
 RCI_FIRST_out = open(PDB_ID+'_'+SHIFT_ID+'.out','w')
 for i in enumerate(FIRST['resi']):
-    RCI_FIRST_out.write('{:>5}'.format(FIRST['resi'][i[0]])+' '+'{:<4}'.format(FIRST['resn'][i[0]])+'{:<23.20f}'.format(float(RCI['score'][i[0]]))+'{:<23.20f}'.format(float(FIRST['score'][i[0]]))+'{:<5.2f}'.format(RCI['shifts'][i[0]])+'{:<10}'.format(RCI['shift_types'][i[0]])+'\n')
+
+    ss = str(FIRST['ss'][i[0]])
+    wd = str(FIRST['welldefined'][i[0]])
+    if ss == 'nan':
+        ss = '.'
+    if wd == 'nan':
+        wd = '.'
+
+    if FIRST['resn'][i[0]] != 'XXX':
+        RCI_FIRST_out.write('{:>5}'.format(FIRST['resi'][i[0]])+' '+'{:<4}'.format(FIRST['resn'][i[0]])+'{:<23.20f}'.format(float(RCI['score'][i[0]]))+'{:<23.20f}'.format(float(FIRST['score'][i[0]]))+ss+' '+wd+' '+'{:<5.2f}'.format(RCI['shifts'][i[0]])+'{:<10}'.format(RCI['shift_types'][i[0]])+'\n')
 RCI_FIRST_out.close()
 
 # append to scores.out
 scores = open('scores.out','a+')
-scores.write('PDB: '+ '{:<11}'.format(PDB_ID) + ' SHIFTS: '+ '{:<11}'.format(SHIFT_ID) + ' SHIFT%: '+ '{:3}'.format(av_perc_shifts) + ' Spearman: '+ '{: 5.3f}'.format(spearman_noRC) + ' CorrelationScore: '+ '{:4.1f}'.format(round(corr_score,1)) + ' RMSD: '+ '{:4.3f}'.format(RMSD_noRC) + ' RMSDScore: '+ '{:4.1f}'.format(round(RMSD_score,1))+ '\n')
+if run_CYRANGE == '1':
+    scores.write('PDB: '+ '{:<11}'.format(PDB_ID) + ' SHIFTS: '+ '{:<11}'.format(SHIFT_ID) + ' SHIFT%: '+ '{:3}'.format(av_perc_shifts) + ' Corr: '+ '{: 5.3f}'.format(spearman_noRC) + ' CorrScore: '+ '{:4.1f}'.format(round(corr_score,1)) + ' RMSD: '+ '{:4.3f}'.format(RMSD_noRC) + ' RMSDScore: '+ '{:4.1f}'.format(round(RMSD_score,1))+ ' Corr-WD: '+ '{: 5.3f}'.format(spearman_noRC_welldefined)+' CorrScore-WD: '+ '{:4.1f}'.format(round(corr_score_welldefined,1)) + ' RMSD-WD: '+ '{:4.3f}'.format(RMSD_noRC_welldefined) + ' RMSDScore-WD: '+ '{:4.1f}'.format(round(RMSD_score_welldefined,1))+'\n')
+else:
+    scores.write('PDB: '+ '{:<11}'.format(PDB_ID) + ' SHIFTS: '+ '{:<11}'.format(SHIFT_ID) + ' SHIFT%: '+ '{:3}'.format(av_perc_shifts) + ' Corr: '+ '{: 5.3f}'.format(spearman_noRC) + ' CorrScore: '+ '{:4.1f}'.format(round(corr_score,1)) + ' RMSD: '+ '{:4.3f}'.format(RMSD_noRC)+ ' RMSDScore: '+ '{:4.1f}'.format(round(RMSD_score,1))+ '\n')
 scores.close()
 
 # plot figs

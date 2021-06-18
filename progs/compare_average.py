@@ -62,11 +62,11 @@ for i in o:
         line = line.split()
         resi = line[0]
         if resi not in av[chain_shiftID]:
-            av[chain_shiftID][resi] = {'resn':line[1],'rci':[float(line[2])],'first':[float(line[3])],'shift_perc':[float(line[4])],'shifts':[line[5]]}
+            av[chain_shiftID][resi] = {'resn':line[1],'rci':[float(line[2])],'first':[float(line[3])],'shift_perc':[float(line[6])],'shifts':[line[7]]}
         else:
             av[chain_shiftID][resi]['rci'].append(float(line[2]))
             av[chain_shiftID][resi]['first'].append(float(line[3]))
-            av[chain_shiftID][resi]['shift_perc'].append(float(line[4]))
+            av[chain_shiftID][resi]['shift_perc'].append(float(line[6]))
 
 n = 0
 for chain_shiftID in av:

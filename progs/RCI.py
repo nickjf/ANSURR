@@ -152,7 +152,7 @@ def average_gly(res):
 def correct_shifts(res,neighbour_res,pos): # correct shifts based on position and neighbouring residue
     for s in res.shifts:
         #if s.atom_type != 'CB':
-        s.shift -= RC_correction[s.atom_type][pos][neighbour_res] # I correted exp shifts originally which is wrong, hence the minus sign here to fix
+        s.shift -= RC_correction[s.atom_type][pos][neighbour_res] # I corrected exp shifts originally which is wrong, hence the minus sign here to fix
         
 def calc_secondary_coil_shifts(res):
     for s in res.shifts: 
