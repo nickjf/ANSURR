@@ -32,7 +32,10 @@ Options:
 
 `-o` combine chains into a single structure when calculating flexibility. This is useful when the structure is an oligomer as oligomerisation will often result in changes in flexibility. Currently this option combines all chains present in the pdb file. A future release will allow you to choose which of the chains should be combined. 
 
-`-r` re-reference chemical shifts using PANAV before running ANSURR
+`-r` re-reference chemical shifts using PANAV before running ANSURR.
+
+`-w` compute ANSURR scores for the well-defined residues identified by CYRANGE. These scores are computed using a seperate benchmark for well-defined residues.
+
 
 
 ## Output
