@@ -59,7 +59,7 @@ def find_breaks(nums):
     breaks = [[n,int(next(iranges))+1] for n in iranges]
     return breaks
 
-def align(RCI,FIRST,cut_off=0.5):
+def align(RCI,FIRST,cut_off=0.01):
     if len(RCI['resn']) <= len(FIRST['resn']): # "a" is always the shorter seq
         a = RCI['resn']
         b = FIRST['resn']
