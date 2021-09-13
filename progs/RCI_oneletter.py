@@ -84,62 +84,41 @@ def extract_shifts_nmrstar3(file_in):
     seq_labels = []
     while True:
         for line in file_in:
-            if "_Entity_poly_seq." in line:
-                seq_labels.append(line.split('.')[1].strip())
-            if "_Entity_poly_seq.Entity_ID" in line:
-                break
-        break
-    for line in file_in:
-        if 'stop_' in line:
-            break
-        elif line.strip() != '':
-            line = line.split()
-            resn = line[seq_labels.index('Mon_ID')]
-            if resn in amino_acids.values():
-                resi = int(line[seq_labels.index('Num')])
-                seq[resi] = resn
-    labels = []
-    while True:
-        for line in file_in:
-            if "_Atom_chem_shift." in line:
-                labels.append(line.split('.')[1].strip())
-            if "_Atom_chem_shift.Assigned_chem_shift_list_ID" in line:
-                break
-        break
+            if "_Entity.Polymer_seq_one_letter_code" in line:
+                line = line.split()
+                print(line)
+                if len(line) = 2:
+                    print(line[1])
     
     atoms = ['HA','HA2','HA3','H','C','CA','CB','N']
     resis = []
     for line in file_in:
         if 'stop_' in line:
             break
-        elif line.strip() != '':
+        elif line != '\n':
             line = line.split()
             atom_type = line[labels.index('Atom_ID')] 
             if atom_type in atoms:
-                shift = line[labels.index('Val')]
-                try: # some files use "." to denote missing shift values
-                    shift = float(shift)
-                    resi = int(line[labels.index('Seq_ID')])
-                    resn = line[labels.index('Comp_ID')]
-                    if resn in amino_acids.values():
-                        for s in seq:
-                            if s == resi:
-                                break
-                            if s not in [r.i for r in res._registry]:
-                                r = res(s,seq[s])
-                                append_secshift(r,'C',0)
-                                append_secshift(r,'CA',0)
-                                append_secshift(r,'CB',0)
-                                append_secshift(r,'N',0)
-                                append_secshift(r,'H',0)
-                                append_secshift(r,'HA',0)
-                                r.assumed_RC = 1
-                        if resi not in resis:
-                            r = res(resi,resn)
-                        append_shift(r,atom_type,shift)
-                        resis.append(resi)
-                except:
-                    pass
+                resi = int(line[labels.index('Seq_ID')])
+                resn = line[labels.index('Comp_ID')]
+                shift = float(line[labels.index('Val')])
+                if resn in amino_acids.values():
+                    for s in seq:
+                        if s == resi:
+                            break
+                        if s not in [r.i for r in res._registry]:
+                            r = res(s,seq[s])
+                            append_secshift(r,'C',0)
+                            append_secshift(r,'CA',0)
+                            append_secshift(r,'CB',0)
+                            append_secshift(r,'N',0)
+                            append_secshift(r,'H',0)
+                            append_secshift(r,'HA',0)
+                            r.assumed_RC = 1
+                    if resi not in resis:
+                        r = res(resi,resn)
+                    append_shift(r,atom_type,shift)
+                    resis.append(resi)
     for r in res._registry:
         if r.name == 'GLY':
             average_gly(r)
