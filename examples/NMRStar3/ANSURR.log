@@ -1,0 +1,79 @@
+
+---------------------------------------------------------------------- 2021-10-15 11:16:15 running ANSURR v1.2.0 ----------------------------------------------------------------------
+
+structure file: 2k2e.pdb
+shifts file: BeR31_2k2e.str
+output dir: 2k2e_BeR31_2k2e
+
+re-referencing chemical shifts using PANAV
+ -> BeR31_2k2e DONE
+calculating RCI for each shifts file
+ -> BeR31_2k2e DONE
+extracting models from 2k2e.pdb
+ -> extracted 20 model(s)
+determining secondary structure for each model using DSSP
+ -> determined secondary structure for 20 model(s)
+calculating flexibility of each model using FIRST
+ -> 2k2eA_1 DONE
+ -> 2k2eA_2 DONE
+ -> 2k2eA_3 DONE
+ -> 2k2eA_4 DONE
+ -> 2k2eA_5 DONE
+ -> 2k2eA_6 DONE
+ -> 2k2eA_7 DONE
+ -> 2k2eA_8 DONE
+ -> 2k2eA_9 DONE
+ -> 2k2eA_10 DONE
+ -> 2k2eA_11 DONE
+ -> 2k2eA_12 DONE
+ -> 2k2eA_13 DONE
+ -> 2k2eA_14 DONE
+ -> 2k2eA_15 DONE
+ -> 2k2eA_16 DONE
+ -> 2k2eA_17 DONE
+ -> 2k2eA_18 DONE
+ -> 2k2eA_19 DONE
+ -> 2k2eA_20 DONE
+calculating validation scores, output will be saved to 2k2e_BeR31_2k2e/ANSURR_output
+ -> 2k2eA_1|BeR31_2k2e DONE
+ -> 2k2eA_2|BeR31_2k2e DONE
+ -> 2k2eA_3|BeR31_2k2e DONE
+ -> 2k2eA_4|BeR31_2k2e DONE
+ -> 2k2eA_5|BeR31_2k2e DONE
+ -> 2k2eA_6|BeR31_2k2e DONE
+ -> 2k2eA_7|BeR31_2k2e DONE
+ -> 2k2eA_8|BeR31_2k2e DONE
+ -> 2k2eA_9|BeR31_2k2e DONE
+ -> 2k2eA_10|BeR31_2k2e DONE
+ -> 2k2eA_11|BeR31_2k2e DONE
+ -> 2k2eA_12|BeR31_2k2e DONE
+ -> 2k2eA_13|BeR31_2k2e DONE
+ -> 2k2eA_14|BeR31_2k2e DONE
+ -> 2k2eA_15|BeR31_2k2e DONE
+ -> 2k2eA_16|BeR31_2k2e DONE
+ -> 2k2eA_17|BeR31_2k2e DONE
+ -> 2k2eA_18|BeR31_2k2e DONE
+ -> 2k2eA_19|BeR31_2k2e DONE
+ -> 2k2eA_20|BeR31_2k2e DONE
+
+--------------------------------------------------------------------- 2021-10-15 11:16:54 ANSURR output v1.2.0 ----------------------------------------------------------------------
+PDB: 2k2eA_1     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.776 CorrScore: 88.4 RMSD: 0.353 RMSDScore: 54.5
+PDB: 2k2eA_2     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.689 CorrScore: 72.2 RMSD: 0.395 RMSDScore: 44.1
+PDB: 2k2eA_3     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.703 CorrScore: 75.2 RMSD: 0.341 RMSDScore: 57.9
+PDB: 2k2eA_4     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.774 CorrScore: 88.1 RMSD: 0.340 RMSDScore: 57.9
+PDB: 2k2eA_5     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.699 CorrScore: 74.1 RMSD: 0.427 RMSDScore: 36.7
+PDB: 2k2eA_6     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.753 CorrScore: 84.8 RMSD: 0.318 RMSDScore: 63.7
+PDB: 2k2eA_7     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.643 CorrScore: 62.1 RMSD: 0.436 RMSDScore: 34.7
+PDB: 2k2eA_8     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.595 CorrScore: 51.4 RMSD: 0.376 RMSDScore: 48.8
+PDB: 2k2eA_9     SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.740 CorrScore: 82.4 RMSD: 0.346 RMSDScore: 56.6
+PDB: 2k2eA_10    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.734 CorrScore: 81.1 RMSD: 0.380 RMSDScore: 48.0
+PDB: 2k2eA_11    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.710 CorrScore: 76.6 RMSD: 0.356 RMSDScore: 53.7
+PDB: 2k2eA_12    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.715 CorrScore: 77.4 RMSD: 0.432 RMSDScore: 35.6
+PDB: 2k2eA_13    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.707 CorrScore: 75.8 RMSD: 0.463 RMSDScore: 29.4
+PDB: 2k2eA_14    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.754 CorrScore: 85.0 RMSD: 0.367 RMSDScore: 50.9
+PDB: 2k2eA_15    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.706 CorrScore: 75.8 RMSD: 0.336 RMSDScore: 59.1
+PDB: 2k2eA_16    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.743 CorrScore: 83.0 RMSD: 0.338 RMSDScore: 58.6
+PDB: 2k2eA_17    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.734 CorrScore: 81.3 RMSD: 0.360 RMSDScore: 52.9
+PDB: 2k2eA_18    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.682 CorrScore: 70.4 RMSD: 0.326 RMSDScore: 61.4
+PDB: 2k2eA_19    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.692 CorrScore: 72.8 RMSD: 0.353 RMSDScore: 54.5
+PDB: 2k2eA_20    SHIFTS: BeR31_2k2e  SHIFT%:  95 Corr:  0.671 CorrScore: 68.3 RMSD: 0.435 RMSDScore: 34.9

@@ -1,0 +1,14 @@
+ANSURR v1.2.0
+
+Major changes
+
+ANSURR can now read NMR Exchange Format (NEF) shift files. This is the preferred format. Please see the README for advice.
+
+
+Minor changes
+
+Added -v flag to provide version number and citation.
+
+Added some examples to help clarify requirements for chemical shift files.
+
+Whether a residue is in a well-defined region or not is included in output text files.

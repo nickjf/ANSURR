@@ -1,8 +1,8 @@
 
-# ANSURR | Accuracy of NMR Structures Using RCI and Rigidity v1.1.0
+# ANSURR | Accuracy of NMR Structures Using RCI and Rigidity v1.2.0
 [![DOI](https://zenodo.org/badge/234519929.svg)](https://zenodo.org/badge/latestdoi/234519929)
 
-ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as described here https://www.nature.com/articles/s41467-020-20177-1. This repository contains the code required to install and run ANSURR on a Linux machine. ANSURR is not yet available for Mac or Windows machines. Please let me know if you have any issues. 
+ANSURR uses backbone chemical shifts to validate the accuracy of NMR protein structures as described here https://www.nature.com/articles/s41467-020-20177-1. This repository contains the code required to install and run ANSURR on a Linux machine. ANSURR is not yet available for Mac or Windows machines. ANSURR is also available on NMRbox (https://nmrbox.org/software/ansurr). Please let me know if you have any issues. 
 
 ## Installation
 
@@ -12,13 +12,13 @@ To install run the shell script `install.sh` and follow the instructions (see be
 
 ## Running ANSURR
 
-ANSURR requires two input files, a NMR protein structure in PDB format and a shifts file in NMR Star v3 format. To re-reference chemical shifts using PANAV before running ANSURR (recommended):
+ANSURR requires two input files, a NMR protein structure in PDB format and a shifts file in NEF format (or NMR Star v3 format, see below for details). To re-reference chemical shifts using PANAV before running ANSURR (recommended):
 
-`ansurr -p xxxx.pdb -s xxxx.str -r`
+`ansurr -p xxxx.pdb -s xxxx.nef -r`
 
 To run without re-referencing chemical shifts:
 
-`ansurr -p xxxx.pdb -s xxxx.str`
+`ansurr -p xxxx.pdb -s xxxx.nef`
 
 Options:
 
@@ -30,13 +30,22 @@ Options:
 
 `-n` include non-standard residues when computing flexibility. Non-standard residues are defined as HETATMs that appear before the TER record in the pdb file. Note that RCI will not be calculated for non-standard residues and so they will not be used to compute validation scores. Regardless, including non-standard residues is a good idea to avoid breaks in the protein structure which would otherwise make those regions too floppy.
 
-`-o` combine chains into a single structure when calculating flexibility. This is useful when the structure is an oligomer as oligomerisation will often result in changes in flexibility. Currently this option combines all chains present in the pdb file. A future release will allow you to choose which of the chains should be combined. 
+`-o` combine chains into a single structure when calculating flexibility. This is useful when the structure is an oligomer as oligomerisation will often result in changes in flexibility. Currently this option combines all chains present in the pdb file. 
 
-`-r` re-reference chemical shifts using PANAV before running ANSURR.
+`-r` re-reference chemical shifts using PANAV before running ANSURR (recommended).
+
+`-v` print version details
 
 `-w` compute ANSURR scores for the well-defined residues identified by CYRANGE. These scores are computed using a seperate benchmark for well-defined residues.
 
 
+## Chemical shift file formats
+
+ANSURR can read in chemical shifts in NEF or NMR Star v3 formats. Some examples are provided in the `examples` directory.
+
+* For NEF format (preferred), the following sections are required: \_nef_nmr_meta_data, \_nef_molecular_system, \_nef_chemical_shift_list
+
+* For NMR Star v3 format, the following fields are required: \_Entity.Polymer_seq_one_letter_code, \_Entity_poly_seq, \_Atom_chem_shift
 
 ## Output
 
@@ -44,8 +53,8 @@ A directory called `<yourpdbfile>_<yourshiftfile>` is made to save the output ge
 
 * `scores.out` - a text file with the validation scores for each model 
 * `<yourpdbfile>_<yourshiftfile>.png` - a graphical summary of the validation scores for each model 
-* `out/` - text files with protein flexibility predicted by RCI and FIRST for each model
-* `figs/` - plots of protein flexibility predicted by RCI and FIRST for each model
+* `out/` - text files for each model which detail the following for each residue: flexibility predicted by RCI, flexibility predicted by FIRST, secondary structure according to DSSP, well-defined regions of the ensemble according to CYRANGE, backbone chemcial shift completeness and which atom types have chemical shift data
+* `figs/` - plots of protein flexibility predicted by RCI (blue) and FIRST (orange) for each model. Alpha helical and beta sheet secondary structure indicated by red and blue dots, respectively. Green dots indicate regions that are well-defined according to CYRANGE. Black crosses indicate residues with no chemical shift data (not used to compute validation scores). 
 
 `other_output` contains output from various programs run as part of ANSURR:
 
@@ -55,6 +64,7 @@ A directory called `<yourpdbfile>_<yourshiftfile>` is made to save the output ge
 * `DSSP/` - secondary structure for each model according to the program DSSP
 * `FIRST/` - flexibility predicted for each model using FIRST
 
+Some examples of ANSURR output are provided in the `examples` directory.
 
 ## Overview of installation instructions
 
@@ -82,17 +92,15 @@ If module installation fails then you will need to find another way to install t
 &nbsp;` -> would you like to try this now? (y/n)`<br><br>
 Java is only required to run PANAV, so ANSURR will run fine without it - but make sure your chemical shifts are referenced correctly or re-reference them using some other software.
 
-
 ## Help
 
 Contact Nick Fowler (njfowler.com) for support, queries or suggestions.
 
 ## Known Issues
 
-- PANAV (a program for re-referencing chemical shifts) has some kind of GUI interface built in to the code and will not run if it can't find a display. This means it won't work when running ANSURR on a remote machine without X forwarding.  
+- ANSURR needs more than just the chemical shift table from NMR Star v3 files. This is because some files contain multiple sets of shifts and ANSURR needs to work out what to do with them. Please see the "Chemical shift file formats" section above for help. Alternatively, consider using NEF format which can be read in by ANSURR v1.2.0 onwards. 
 
-- calc_rigidity might not run for RatHat Enterprise Linux 6 (RHEL6) and earlier because it needs gcc4.8.4. RHEL6 comes with gcc4.4.x. So ANSURR will not run correctly. 
-
+- calc_rigidity might not run for RatHat Enterprise Linux 6 (RHEL6) and earlier because it needs gcc4.8.4 (or later). RHEL6 comes with gcc4.4.x. So ANSURR will not run correctly. Please contact me if this is an issue for you, or consider using the ANSURR on NMR box (https://nmrbox.org/software/ansurr).
 
 ## Acknowledgements
 

@@ -16,6 +16,7 @@ compare_average=$ANSURR_DIR/progs/compare_average.py
 plot2D=$ANSURR_DIR/progs/plot2D.py
 CYRANGE=$ANSURR_DIR/progs/cyrange
 extract_cyrange=$ANSURR_DIR/progs/extract_cyrange.py
+convert_NEF=$ANSURR_DIR/progs/convert_NEF.py
 
 ########## ARGS ##########
 run_PANAV=0
@@ -25,7 +26,7 @@ free_ligands=0
 nonstandard_res=0
 oligomer=0
 bonds=0
-while getopts ":p:s:abhlnorw" opt; do
+while getopts ":p:s:abhlnorvw" opt; do
   case $opt in
 	h) echo "Usage:"
 	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
@@ -36,7 +37,8 @@ while getopts ":p:s:abhlnorw" opt; do
 	   echo " -l | include free ligands when calculating flexibility"
 	   echo " -n | include non-standard residues when calculating flexibility"
 	   echo " -o | combine chains when calculating flexibility (e.g. for dimers)"
-	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI"
+	   echo " -r | re-reference chemical shifts using PANAV before calculating RCI (recommended)"
+	   echo " -v | print version details"
 	   echo " -w | compute ANSURR scores for the well-defined residues identified by CYRANGE"
 	   exit 1;;
     p) if [ ! -f "$OPTARG" ]; then
@@ -71,6 +73,8 @@ while getopts ":p:s:abhlnorw" opt; do
 	n)  nonstandard_res=1;;
 	o)  oligomer=1;;
 	r)  run_PANAV=1;;
+	v)  echo $'\nANSURR | Accuracy of NMR Structures Using RCI and Rigidity 1.2.0\n\nIf you use ANSURR, please cite:\nN. J. Fowler, A. Sljoka, M. P. Williamson\nA method for validating the accuracy of NMR protein structures\nNature Communications 11, 6321 (2020) https://doi.org/10.5281/zenodo.4161586\n'
+		exit 1;;
 	w)  run_CYRANGE=1;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
@@ -106,20 +110,27 @@ echo "$output_info"
 # log file
 log=../ANSURR.log
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n---------------------------------------------------------------------- '$DATE' running ANSURR v1.1.0 ----------------------------------------------------------------------' | tee -a $log
+echo $'\n---------------------------------------------------------------------- '$DATE' running ANSURR v1.2.0 ----------------------------------------------------------------------' | tee -a $log
 echo '' >> $log
 echo "$structure_info" >> $log
 echo "$shift_info" >> $log
 echo "$output_info" >> $log
 echo '' >> $log
 
-########## SPLIT SHIFTS ###########
+########## Check if shifts in NEF format, otherwise assume NMR star v3 ##########
 
-entities=$(grep "_Entity.ID" $shifts.str | wc -l)
-if (( $entities > 1 )); then
-	echo "$entities entities found in shifts file" | tee -a $log
-	$python_version $split_shifts $shifts.str | tee -a $log
+if grep -q "_nef_chemical_shift." $shifts.str; then
+	echo "shifts are in NEF format" | tee -a $log
+	$python_version $convert_NEF $shifts.str | tee -a $log
 	rm $shifts.str
+else
+	########## SPLIT SHIFTS (only applicable to NMR star format) ###########
+	entities=$(grep "_Entity.ID" $shifts.str | wc -l)
+	if (( $entities > 1 )); then
+		echo "$entities entities found in shifts file" | tee -a $log
+		$python_version $split_shifts $shifts.str | tee -a $log
+		rm $shifts.str
+	fi
 fi
 
 ########## PANAV ##########
@@ -329,7 +340,7 @@ fi
 echo "calculating validation scores, output will be saved to $structure"_"$shifts/ANSURR_output" | tee -a $log
 mkdir ANSURR_output
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n--------------------------------------------------------------------- '$DATE' ANSURR output v1.1.0 ----------------------------------------------------------------------'  > scores.out
+echo $'\n--------------------------------------------------------------------- '$DATE' ANSURR output v1.2.0 ----------------------------------------------------------------------'  > scores.out
 
 if (( $oligomer == 1 )); then
 	for pdb in other_output/FIRST/$structure*.decomp; do
