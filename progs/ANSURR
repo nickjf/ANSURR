@@ -73,7 +73,7 @@ while getopts ":p:s:abhlnorvw" opt; do
 	n)  nonstandard_res=1;;
 	o)  oligomer=1;;
 	r)  run_PANAV=1;;
-	v)  echo $'\nANSURR | Accuracy of NMR Structures Using RCI and Rigidity 1.2.0\n\nIf you use ANSURR, please cite:\nN. J. Fowler, A. Sljoka, M. P. Williamson\nA method for validating the accuracy of NMR protein structures\nNature Communications 11, 6321 (2020) https://doi.org/10.5281/zenodo.4161586\n'
+	v)  echo $'\nANSURR | Accuracy of NMR Structures Using RCI and Rigidity v1.2.0\n\nIf you use ANSURR, please cite:\nN. J. Fowler, A. Sljoka, M. P. Williamson\nA method for validating the accuracy of NMR protein structures\nNature Communications 11, 6321 (2020) https://doi.org/10.1038/s41467-020-20177-1\n'
 		exit 1;;
 	w)  run_CYRANGE=1;;
     \?) echo "Invalid option: -$OPTARG" >&2
