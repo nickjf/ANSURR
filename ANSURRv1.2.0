@@ -12,3 +12,4 @@ Added -v flag to provide version number and citation.
 Added some examples to help clarify requirements for chemical shift files.
 
 Whether a residue is in a well-defined region or not is included in output text files.
+

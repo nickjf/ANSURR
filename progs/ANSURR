@@ -73,7 +73,7 @@ while getopts ":p:s:abhlnorvw" opt; do
 	n)  nonstandard_res=1;;
 	o)  oligomer=1;;
 	r)  run_PANAV=1;;
-	v)  echo $'\nANSURR | Accuracy of NMR Structures Using RCI and Rigidity v1.2.0\n\nIf you use ANSURR, please cite:\nN. J. Fowler, A. Sljoka, M. P. Williamson\nA method for validating the accuracy of NMR protein structures\nNature Communications 11, 6321 (2020) https://doi.org/10.1038/s41467-020-20177-1\n'
+	v)  echo $'\nANSURR | Accuracy of NMR Structures Using RCI and Rigidity v1.2.1\n\nIf you use ANSURR, please cite:\nN. J. Fowler, A. Sljoka, M. P. Williamson\nA method for validating the accuracy of NMR protein structures\nNature Communications 11, 6321 (2020) https://doi.org/10.1038/s41467-020-20177-1\n'
 		exit 1;;
 	w)  run_CYRANGE=1;;
     \?) echo "Invalid option: -$OPTARG" >&2
@@ -110,7 +110,7 @@ echo "$output_info"
 # log file
 log=../ANSURR.log
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n---------------------------------------------------------------------- '$DATE' running ANSURR v1.2.0 ----------------------------------------------------------------------' | tee -a $log
+echo $'\n---------------------------------------------------------------------- '$DATE' running ANSURR v1.2.1 ----------------------------------------------------------------------' | tee -a $log
 echo '' >> $log
 echo "$structure_info" >> $log
 echo "$shift_info" >> $log
@@ -340,7 +340,7 @@ fi
 echo "calculating validation scores, output will be saved to $structure"_"$shifts/ANSURR_output" | tee -a $log
 mkdir ANSURR_output
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-echo $'\n--------------------------------------------------------------------- '$DATE' ANSURR output v1.2.0 ----------------------------------------------------------------------'  > scores.out
+echo $'\n--------------------------------------------------------------------- '$DATE' ANSURR output v1.2.1 ----------------------------------------------------------------------'  > scores.out
 
 if (( $oligomer == 1 )); then
 	for pdb in other_output/FIRST/$structure*.decomp; do

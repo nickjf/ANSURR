@@ -126,13 +126,11 @@ for model in models: # this orders by resi number as sometimes pdbs are not orde
 		    if resi not in resi_pdb_lines:
 		        resi_pdb_lines[resi] = [line]
 		    else:
-		        resi_pdb_lines[resi].append(line)
-		sorted_resi_pdb_lines = {}
-		for key in sorted(resi_pdb_lines.keys()) :
-		    sorted_resi_pdb_lines[key] = resi_pdb_lines[key]    
+		        resi_pdb_lines[resi].append(line) 
 
-		pdb_lines = [sorted_resi_pdb_lines[i] for i in sorted_resi_pdb_lines]
+		pdb_lines = [resi_pdb_lines[i] for i in sorted(resi_pdb_lines)]
 		models[model][chain] =  [item for sublist in pdb_lines for item in sublist]
+
 
 chains_done = []
 resi_ref = {}
