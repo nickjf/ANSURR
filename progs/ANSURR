@@ -28,8 +28,9 @@ oligomer=0
 bonds=0
 while getopts ":p:s:abhlnorvw" opt; do
   case $opt in
-	h) echo "Usage:"
-	   echo " ansurr -p [pdb file] -s [NMRStarV3 shift file]"
+	h) echo "ANSURR | Accuracy of NMR Structures Using RCI and Rigidity v1.2.1"
+	   echo "Usage:"
+	   echo " ansurr -p [pdb file] -s [NEF/NMRStarV3 shift file]"
 	   echo "Options:"
 	   echo " -b | read in extra covalent bonds from CONECT records in the structure file"
 	   #echo " -i | set mininum sequence identity required between sequences in shift and structure files (default 50%)"
